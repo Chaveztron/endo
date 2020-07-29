@@ -5,8 +5,9 @@ import { Button } from "@blueprintjs/core";
 import { Form, Input, Select, NumInput, Radios, DatePiker } from "./components";
 const { ipcRenderer } = window.require("electron");
 
+
+
 const App = () => {
-  const [users, setUser] = useState(ipcRenderer.sendSync('get-pacientes'))
 
   return (
     <BrowserRouter>
@@ -28,26 +29,16 @@ const App = () => {
         </div>
       </nav>
 
-      <Route path='/' exact render={Add_paciente} />
-      <Route path='/Pacientes' render={Pacientes} />
+      <Route path='/' exact render={Add_paciente}/>
+      <Route path='/Pacientes' render={(props)=> <Pacientes {...props} />} />
       <Route path='/videos' render={Videos} />
-
-      <ul>
-      {users.map(user =>(
-          <li key={user.id}>
-              { user.id }	{ user.nombre }
-          </li>
-      ))}
-      </ul>
-
-
     </BrowserRouter>
     
   )
 }
 
 
-const Add_paciente = () => {
+const Add_paciente = (props) => {
   const onSubmit = data => {
     console.log(data)
     console.log(ipcRenderer.sendSync('add-paciente', {
@@ -59,9 +50,10 @@ const Add_paciente = () => {
       telefono: data.Telefono,
       sexo: data.Sexo
     }))
+    
   };
   return(
-    <>
+    <React.Fragment>
       <h1>Agregar Paciente</h1>
       <Form onSubmit={onSubmit}>
         <Input name="Nombre"/>
@@ -72,8 +64,8 @@ const Add_paciente = () => {
         <Select name="Genero" options={["mujer", "hombre"]} />
         <DatePiker name="Nacimiento"/>
         <Button type="submit" value="Submit" >Agregar </Button>
-      </Form>
-    </>
+      </Form> 
+    </React.Fragment>
   )
 }
   
@@ -81,11 +73,41 @@ const Add_paciente = () => {
 
 
 const Pacientes = (props) => {
-  return(
-    <>
-    <h1>Pacientes</h1>
+  const [users, setUser] = useState(ipcRenderer.sendSync('get-pacientes'))
 
-      </>
+  
+  return(
+    <React.Fragment>
+    <h1>Pacientes</h1>
+      <table class="bp3-html-table bp3-html-table-bordered bp3-html-table-condensed bp3-html-table-striped bp3-interactive bp3-small">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>Nombre</th>
+          <th>A.Paterno</th>
+          <th>A.Materno</th>
+          <th>Telefono</th>
+          <th>Sexo</th>
+          <th>Genero</th>
+          <th>Nacimiento</th>
+        </tr>
+      </thead>
+      <tbody>
+        {users.map(user =>(
+          <tr key={user.id}>
+            <td>{ user.id }</td>
+            <td>{ user.nombre }</td>
+            <td>{ user.apellido_paterno }</td>
+            <td>{ user.apellido_materno }</td>
+            <td>{ user.telefono }</td>
+            <td>{ user.sexo }</td>
+            <td>{ user.genero }</td>            
+            <td>{ user.nacimiento }</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    </React.Fragment>
     )
     
 }

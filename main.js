@@ -67,7 +67,16 @@ app.on('ready', () => {
         knex.from('paciente').select("*")
         .then((rows) => {
             for (row of rows) {
-                var paciente = {id: row.id, 'nombre': row.nombre };
+                var paciente = {
+                    id: row.id, 
+                    nombre: row.nombre,
+                    apellido_paterno: row.apellido_paterno,
+                    apellido_materno: row.apellido_materno,
+                    genero: row.genero,
+                    nacimiento: row.nacimiento,
+                    telefono: row.telefono,
+                    sexo: row.sexo
+                };
                 pacientes.push(paciente);
             }
             event.returnValue = pacientes
