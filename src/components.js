@@ -40,7 +40,7 @@ export function DatePiker({ register, name, ...rest }) {
 
 export function Radios({ register, values, name, ...rest }) {
   return (
-    <>
+    <React.Fragment>
     <Row vertical='center'>
       {values.map(value => (
         <label class="bp3-control bp3-radio">
@@ -50,7 +50,7 @@ export function Radios({ register, values, name, ...rest }) {
         </label>
     ))}
     </Row>
-    </>
+    </React.Fragment>
   );
 }
 

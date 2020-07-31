@@ -6,6 +6,7 @@
     "@blueprintjs/core": "^3.30.0",
     "electron-is-dev": "^1.2.0",
     "knex": "^0.21.2",
+    "query-string": "^6.13.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-hook-form": "^6.1.0",

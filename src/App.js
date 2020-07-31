@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Route, NavLink } from 'react-router-dom'
+import queryString from 'query-string'
 import './App.css'
 import { Button } from "@blueprintjs/core";
 import { Form, Input, Select, NumInput, Radios, DatePiker } from "./components";
@@ -90,11 +91,14 @@ const Pacientes = (props) => {
           <th>Sexo</th>
           <th>Genero</th>
           <th>Nacimiento</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         {users.map(user =>(
+          
           <tr key={user.id}>
+          
             <td>{ user.id }</td>
             <td>{ user.nombre }</td>
             <td>{ user.apellido_paterno }</td>
@@ -103,7 +107,9 @@ const Pacientes = (props) => {
             <td>{ user.sexo }</td>
             <td>{ user.genero }</td>            
             <td>{ user.nacimiento }</td>
+            <td><NavLink to={`/videos?id=${user.id}`}><button class="bp3-button bp3-minimal bp3-icon-desktop"/></NavLink></td>
           </tr>
+          
         ))}
       </tbody>
     </table>
@@ -112,9 +118,19 @@ const Pacientes = (props) => {
     
 }
 
-const Videos = () => (
-  <h1>Videos</h1>
-)
+const Videos = ({ location}) => {
+  console.log(location)
+  const { id } = queryString.parse(location.search)
+
+  return (
+    <div>
+      <h1>ID</h1>
+      <div>
+        ID: { id }
+      </div>
+    </div>
+  )
+}
 
 const NavegacionImperativa = ({ history }) => {
   console.log(history)
