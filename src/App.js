@@ -3,13 +3,11 @@ import { BrowserRouter, Route, NavLink } from 'react-router-dom'
 import queryString from 'query-string'
 import './App.css'
 import { Button } from "@blueprintjs/core";
+import Webcam from "react-webcam";
 import { Form, Input, Select, NumInput, Radios, DatePiker } from "./components";
 const { ipcRenderer } = window.require("electron");
 
-
-
 const App = () => {
-
   return (
     <BrowserRouter>
       <nav class="bp3-navbar .modifier">
@@ -29,15 +27,12 @@ const App = () => {
           <button class="bp3-button bp3-minimal bp3-icon-cog"></button>
         </div>
       </nav>
-
       <Route path='/' exact render={Add_paciente}/>
       <Route path='/Pacientes' render={(props)=> <Pacientes {...props} />} />
-      <Route path='/videos' render={Videos} />
-    </BrowserRouter>
-    
+      <Route path='/videos' render={(props)=> <Videos {...props} />} />
+    </BrowserRouter>    
   )
 }
-
 
 const Add_paciente = (props) => {
   const onSubmit = data => {
@@ -50,8 +45,7 @@ const Add_paciente = (props) => {
       nacimiento: data.Nacimiento,
       telefono: data.Telefono,
       sexo: data.Sexo
-    }))
-    
+    }))    
   };
   return(
     <React.Fragment>
@@ -69,14 +63,17 @@ const Add_paciente = (props) => {
     </React.Fragment>
   )
 }
-  
-
-
 
 const Pacientes = (props) => {
   const [users, setUser] = useState(ipcRenderer.sendSync('get-pacientes'))
 
-  
+  useEffect(()=>{
+    console.log("dentro de los Pacientes")
+    return(
+      console.log("Saliendo del componente")
+    )
+  })
+
   return(
     <React.Fragment>
     <h1>Pacientes</h1>
@@ -96,9 +93,7 @@ const Pacientes = (props) => {
       </thead>
       <tbody>
         {users.map(user =>(
-          
           <tr key={user.id}>
-          
             <td>{ user.id }</td>
             <td>{ user.nombre }</td>
             <td>{ user.apellido_paterno }</td>
@@ -109,26 +104,73 @@ const Pacientes = (props) => {
             <td>{ user.nacimiento }</td>
             <td><NavLink to={`/videos?id=${user.id}`}><button class="bp3-button bp3-minimal bp3-icon-desktop"/></NavLink></td>
           </tr>
-          
         ))}
       </tbody>
     </table>
     </React.Fragment>
-    )
-    
+    )    
 }
 
-const Videos = ({ location}) => {
+const Videos = ({location}, props) => {
+  const [deviceId, setDeviceId] = React.useState("");
+  const [devices, setDevices] = React.useState([]);
+  const [photos, setPhotos] = React.useState([]);
+ 
+  const handleDevices = React.useCallback(
+    mediaDevices =>
+      setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput")),
+    [setDevices]
+  );
+ 
+  React.useEffect(
+    () => {
+      navigator.mediaDevices.enumerateDevices().then(handleDevices);
+    },
+    [handleDevices]
+  );
+
+  const webcamRef = React.useRef(null);
+ 
+  const capture = React.useCallback(
+    () => {
+      const imageSrc = webcamRef.current.getScreenshot();
+      console.log(imageSrc)
+      setPhotos(photos => [...photos,imageSrc])
+    },
+    [webcamRef]
+  )
+
   console.log(location)
   const { id } = queryString.parse(location.search)
 
+  const onSubmit = data => {
+    setDeviceId(data.Device)
+  }
+
+  let myArray = [];
+
+  devices.map((device) => (
+    myArray.push(device.deviceId)
+  ))
+
   return (
-    <div>
-      <h1>ID</h1>
-      <div>
-        ID: { id }
-      </div>
-    </div>
+    <React.Fragment>
+      <h1>Endoscopía</h1>
+      <h2>ID: { id }</h2>
+      <Form onSubmit={onSubmit}>
+        <Select name="Device" options={myArray} />
+        <Button type="submit" value="Submit" >Seleccionar</Button>
+      </Form>
+
+          <Webcam audio={false} videoConstraints={{ deviceId: deviceId }} ref={webcamRef} screenshotFormat="image/jpeg" />
+          <button onClick={capture}>Capture photo</button>
+
+          {photos.map((photo) => (
+            <img src={photo} />
+          ))}
+          
+ 
+    </React.Fragment>
   )
 }
 
@@ -142,7 +184,5 @@ const NavegacionImperativa = ({ history }) => {
     </div>
   )
 }
-
-
 
 export default App
