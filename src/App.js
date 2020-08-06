@@ -10,6 +10,7 @@ const { ipcRenderer } = window.require("electron");
 const App = () => {
   return (
     <BrowserRouter>
+    <div style={{backgroundColor: "#566573", color: "white"}}>
       <nav class="bp3-navbar .modifier">
         <div class="bp3-navbar-group bp3-align-left">
         <Route render={NavegacionImperativa} />
@@ -30,6 +31,7 @@ const App = () => {
       <Route path='/' exact render={Add_paciente}/>
       <Route path='/Pacientes' render={(props)=> <Pacientes {...props} />} />
       <Route path='/videos' render={(props)=> <Videos {...props} />} />
+      </div>
     </BrowserRouter>    
   )
 }
@@ -66,7 +68,6 @@ const Add_paciente = (props) => {
 
 const Pacientes = (props) => {
   const [users, setUser] = useState(ipcRenderer.sendSync('get-pacientes'))
-
   useEffect(()=>{
     console.log("dentro de los Pacientes")
     return(
@@ -115,22 +116,18 @@ const Videos = ({location}, props) => {
   const [deviceId, setDeviceId] = React.useState("");
   const [devices, setDevices] = React.useState([]);
   const [photos, setPhotos] = React.useState([]);
- 
   const handleDevices = React.useCallback(
     mediaDevices =>
       setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput")),
     [setDevices]
   );
- 
   React.useEffect(
     () => {
       navigator.mediaDevices.enumerateDevices().then(handleDevices);
     },
     [handleDevices]
   );
-
   const webcamRef = React.useRef(null);
- 
   const capture = React.useCallback(
     () => {
       const imageSrc = webcamRef.current.getScreenshot();
@@ -139,20 +136,18 @@ const Videos = ({location}, props) => {
     },
     [webcamRef]
   )
-
   console.log(location)
   const { id } = queryString.parse(location.search)
-
   const onSubmit = data => {
     setDeviceId(data.Device)
+    let now = new Date().getTime();
+    console.log(now)
+    console.log(Date(now))
   }
-
   let myArray = [];
-
   devices.map((device) => (
     myArray.push(device.deviceId)
   ))
-
   return (
     <React.Fragment>
       <h1>Endoscopía</h1>
@@ -161,22 +156,21 @@ const Videos = ({location}, props) => {
         <Select name="Device" options={myArray} />
         <Button type="submit" value="Submit" >Seleccionar</Button>
       </Form>
-
-          <Webcam audio={false} videoConstraints={{ deviceId: deviceId }} ref={webcamRef} screenshotFormat="image/jpeg" />
-          <button onClick={capture}>Capture photo</button>
-
+      {deviceId
+        ?  <React.Fragment>
+        <Webcam audio={false} videoConstraints={{ deviceId: deviceId }} ref={webcamRef} screenshotFormat="image/jpeg" />  
+        <Button onClick={capture}>Capture photo</Button></React.Fragment>
+        : <h1>Rellene el fomulario y seleccione fuente capturadora</h1>
+      }
           {photos.map((photo) => (
             <img src={photo} />
           ))}
-          
- 
     </React.Fragment>
   )
 }
 
 const NavegacionImperativa = ({ history }) => {
   console.log(history)
-
   return (
     <div>
       <button class="bp3-button bp3-minimal bp3-icon-undo" onClick={history.goBack}/>
