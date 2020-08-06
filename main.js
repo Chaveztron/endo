@@ -59,6 +59,21 @@ app.on('ready', () => {
           
         event.returnValue = 'dato insertado'
       })
+
+      ipcMain.on('add-sesion', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('sesiones').insert({ 
+            paciente: arg.paciente,
+            fecha: arg.fecha
+        }).returning('id')
+        .then(function (id) {
+        event.returnValue = id
+        })
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
     
       
       ipcMain.on('get-pacientes', (event, arg) => {

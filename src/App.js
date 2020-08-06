@@ -10,7 +10,6 @@ const { ipcRenderer } = window.require("electron");
 const App = () => {
   return (
     <BrowserRouter>
-    <div style={{backgroundColor: "#566573", color: "white"}}>
       <nav class="bp3-navbar .modifier">
         <div class="bp3-navbar-group bp3-align-left">
         <Route render={NavegacionImperativa} />
@@ -31,7 +30,6 @@ const App = () => {
       <Route path='/' exact render={Add_paciente}/>
       <Route path='/Pacientes' render={(props)=> <Pacientes {...props} />} />
       <Route path='/videos' render={(props)=> <Videos {...props} />} />
-      </div>
     </BrowserRouter>    
   )
 }
@@ -143,6 +141,13 @@ const Videos = ({location}, props) => {
     let now = new Date().getTime();
     console.log(now)
     console.log(Date(now))
+
+    console.log(ipcRenderer.sendSync('add-sesion', {
+      paciente: id,
+      fecha: now,
+    }))
+
+
   }
   let myArray = [];
   devices.map((device) => (
@@ -158,8 +163,9 @@ const Videos = ({location}, props) => {
       </Form>
       {deviceId
         ?  <React.Fragment>
+        <button onClick={capture} class="bp3-button bp3-minimal bp3-icon-camera"/><br/>
         <Webcam audio={false} videoConstraints={{ deviceId: deviceId }} ref={webcamRef} screenshotFormat="image/jpeg" />  
-        <Button onClick={capture}>Capture photo</Button></React.Fragment>
+        </React.Fragment>
         : <h1>Rellene el fomulario y seleccione fuente capturadora</h1>
       }
           {photos.map((photo) => (
