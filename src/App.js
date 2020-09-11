@@ -244,16 +244,21 @@ const updateFieldChanged = index => e => {
   return(
     <React.Fragment>
     <h1>Esquema</h1>
-
+    <div class="flexy">
+    <div class="flex-container">
     {photos.slice(0).map((photo, index) => (
-      <Card interactive={true} elevation={Elevation.TWO} key={photo.ids} style={{width: "290px", margin: "20px"}}>
-        <p style={{width: "290px", margin: "-20px", marginBottom: "20px"}}><button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>{photo.ids}</p>
-        <img style={{width: "290px", margin: "-20px"}} src={photo.imageSrc}/>
-        <input style={{width: "290px", margin: "-20px", marginTop: "20px"}} type="text" name="name" value={photo.lugarOrgano} onChange={updateFieldChanged(index)}  />
+      <Card interactive={true} elevation={Elevation.TWO} key={photo.ids} style={{width: "250px", margin: "20px"}}>
+        <p style={{width: "250px", margin: "-20px", marginBottom: "20px"}}><button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>{photo.ids}</p>
+        <img style={{width: "250px", margin: "-20px"}} src={photo.imageSrc}/>
+        <input style={{width: "250px", margin: "-20px", marginTop: "20px"}} type="text" name="name" value={photo.lugarOrgano} onChange={updateFieldChanged(index)}  />
         
       </Card>
     ))}
-      
+    </div>
+    <div class="c">
+    (Esquema de organo)
+    </div>
+    </div>
     </React.Fragment>
     )    
 }

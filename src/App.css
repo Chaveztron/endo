@@ -36,3 +36,37 @@
     transform: rotate(360deg);
   }
 }
+
+
+html,
+body {
+  height: 100%;
+}
+
+.flex-container {
+  width: 70%;
+}
+
+.flexy, .flex-container{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.nav {
+  background-color: red;
+  flex: 1
+}
+
+.main {
+  background-color: blue;
+  flex: 1
+}
+
+.c{
+  width:100px;
+  height: 100px;
+  margin-right: 30px;
+  background-color: red;
+  border: solid;
+  flex: 1
+}
