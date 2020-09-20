@@ -65,8 +65,6 @@ body {
 .c{
   width:100px;
   height: 100px;
-  margin-right: 30px;
-  background-color: red;
-  border: solid;
+  margin-left: -20px;
   flex: 1
 }

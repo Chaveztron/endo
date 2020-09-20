@@ -74,6 +74,17 @@ app.on('ready', () => {
             knex.destroy();
         });
       })
+
+      ipcMain.on('add-esquema', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('sesiones').where({ 'id': arg.id })
+        .update({ esquema: arg.esquema })
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+        event.returnValue = 'esquema insertado'
+      })
     
       
       ipcMain.on('get-pacientes', (event, arg) => {

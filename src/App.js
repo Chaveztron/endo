@@ -5,6 +5,7 @@ import './App.css'
 import { Button, Card, Elevation } from "@blueprintjs/core";
 import Webcam from "react-webcam";
 import { Form, Input, Select, NumInput, Radios, DatePiker } from "./components";
+import HomePage from "./esquemaJs/HomePage";
 const { ipcRenderer } = window.require("electron");
 
 const App = () => {
@@ -116,6 +117,7 @@ const Videos = ({location}, props) => {
   const [deviceId, setDeviceId] = React.useState("");
   const [devices, setDevices] = React.useState([]);
   const [photos, setPhotos] = React.useState([]);
+  const [sesion, setSesion] = React.useState("")
   const handleDevices = React.useCallback(
     mediaDevices =>
       setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput")),
@@ -152,7 +154,7 @@ const Videos = ({location}, props) => {
     console.log(now)
     console.log(Date(now))
 
-    console.log(ipcRenderer.sendSync('add-sesion', {
+    setSesion(ipcRenderer.sendSync('add-sesion', {
       paciente: id,
       fecha: now,
     }))
@@ -189,7 +191,8 @@ const Videos = ({location}, props) => {
       <NavLink 
       to={{pathname:'/esquema',
           esquemaProps:{
-            photos: photos
+            photos: photos,
+            sesion: sesion
           }}}>
       <button class="bp3-button bp3-minimal bp3-icon-desktop"/>
       </NavLink>
@@ -219,13 +222,17 @@ const Videos = ({location}, props) => {
 }
 
 const Esquema = (props) => {
-  const [photos, setPhotos] = React.useState(props.location.esquemaProps.photos);
+  const [photos, setPhotos] = React.useState(props.location.esquemaProps.photos)
+  const [sesion, setSesion] = React.useState(props.location.esquemaProps.sesion)
+  const [esquema, setEsquema] = React.useState("")
+
   useEffect(()=>{
     console.log("dentro de Esquema")
     return(
       console.log("Saliendo del Esquema")
     )
   })
+
 
   const deleteItem = (i) => {
     const newPhotos = [...photos]
@@ -241,9 +248,17 @@ const updateFieldChanged = index => e => {
   setPhotos(newArr); // ??
 }
 
+const guardar = () => {
+  console.log(ipcRenderer.sendSync('add-esquema', {
+    id: sesion,
+    esquema: esquema,
+  }))
+}
+
   return(
     <React.Fragment>
     <h1>Esquema</h1>
+    <h1>{sesion}</h1>
     <div class="flexy">
     <div class="flex-container">
     {photos.slice(0).map((photo, index) => (
@@ -255,9 +270,10 @@ const updateFieldChanged = index => e => {
       </Card>
     ))}
     </div>
-    <div class="c">
-    (Esquema de organo)
+    <div class="c"  >
+    <HomePage dataImage={image => setEsquema(image)}/>
     </div>
+    <button onClick={guardar} class="bp3-button bp3-minimal bp3-icon-camera"/>
     </div>
     </React.Fragment>
     )    
