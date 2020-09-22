@@ -253,6 +253,16 @@ const guardar = () => {
     id: sesion,
     esquema: esquema,
   }))
+
+  photos.map((photo) => ( 
+    console.log(ipcRenderer.sendSync('add-captura', {
+      sesion:  sesion,
+      identificador: photo.ids,
+      captura: photo.imageSrc,
+      descripcion:  photo.lugarOrgano
+    })) 
+  ))
+
 }
 
   return(

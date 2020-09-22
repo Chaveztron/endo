@@ -85,6 +85,24 @@ app.on('ready', () => {
         });
         event.returnValue = 'esquema insertado'
       })
+
+
+      ipcMain.on('add-captura', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('captura').insert({ 
+            sesion: arg.sesion,
+            identificador: arg.identificador,
+            captura: arg.captura,
+            descripcion: arg.descripcion
+        }).returning('id')
+        .then(function (id) {
+        event.returnValue = id
+        })
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
     
       
       ipcMain.on('get-pacientes', (event, arg) => {
