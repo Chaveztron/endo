@@ -21,8 +21,6 @@ const App = () => {
         <div class="bp3-navbar-group bp3-align-right">
         <NavLink to='/' exact activeClassName='active'><button class="bp3-button bp3-minimal bp3-intent-success bp3-icon-add">Agregar paciente</button></NavLink>
         <NavLink to='/Pacientes' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-database">Pacientes</button></NavLink>
-        <NavLink to='/videos' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-document">Videos</button></NavLink>
-        <NavLink to='/esquema' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-document">Esquema</button></NavLink>
           <span class="bp3-navbar-divider"></span>
           <button class="bp3-button bp3-minimal bp3-icon-user"></button>
           <button class="bp3-button bp3-minimal bp3-icon-notifications"></button>
@@ -33,7 +31,9 @@ const App = () => {
       <Route path='/Pacientes' render={(props)=> <Pacientes {...props} />} />
       <Route path='/videos' render={(props)=> <Videos {...props} />} />
       <Route path='/esquema' render={(props)=> <Esquema {...props} />} />
-    </BrowserRouter>    
+      <Route path='/estudios' render={(props)=> <Estudios {...props} />} />
+      <Route path='/reportes' render={(props)=> <Reportes {...props} />} />
+    </BrowserRouter>
   )
 }
 
@@ -104,11 +104,117 @@ const Pacientes = (props) => {
             <td>{ user.sexo }</td>
             <td>{ user.genero }</td>            
             <td>{ user.nacimiento }</td>
-            <td><NavLink to={`/videos?id=${user.id}`}><button class="bp3-button bp3-minimal bp3-icon-desktop"/></NavLink></td>
+            <td>
+            <NavLink to={`/videos?id=${user.id}`}>
+            <button class="bp3-button bp3-minimal bp3-icon-desktop"/>
+            </NavLink>
+            <NavLink 
+            to={{pathname:'/estudios',
+            estudiosProps:{
+              user_id: user.id
+            }}}
+            >
+            <button class="bp3-button bp3-minimal bp3-icon-document"/>
+            </NavLink>
+            </td>
           </tr>
         ))}
       </tbody>
     </table>
+    </React.Fragment>
+    )    
+}
+
+const Estudios = (props) => {
+  const [estudios, setEstudios] = useState(ipcRenderer.sendSync('get-sesiones', {
+    user_id:  props.location.estudiosProps.user_id
+  }))
+  useEffect(()=>{
+    console.log("dentro de los Pacientes")
+    return(
+      console.log("Saliendo del componente")
+    )
+  })
+
+  return(
+    <React.Fragment>
+    <h1>Sesiones</h1>
+      <table class="bp3-html-table bp3-html-table-bordered bp3-html-table-condensed bp3-html-table-striped bp3-interactive bp3-small">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>Fecha</th>
+          <th>acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {estudios.map(estudio =>(
+          <tr key={estudio.id}>
+            <td>{ estudio.id }</td>
+            <td>
+            {new Intl.DateTimeFormat("default", {
+              year: "numeric",
+              month: "long",
+              day: "2-digit",
+              hour: 'numeric',
+              minute: 'numeric',
+              second: 'numeric'
+            }).format(estudio.fecha)}
+            </td>
+            <td>
+            <NavLink
+            to={{pathname:'/reportes',
+            reporteProps:{
+              estudios_id: estudio.id,
+              esquema: estudio.esquema
+            }}}
+            >
+            <button class="bp3-button bp3-minimal bp3-icon-print"/>
+            </NavLink>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    </React.Fragment>
+    )    
+}
+
+const Reportes = (props) => {
+  const [capturas, setCapturas] = useState(ipcRenderer.sendSync('get-capturas', {
+    sesion_id:  props.location.reporteProps.estudios_id
+  }))
+  const [esquema, setEsquema] = React.useState(props.location.reporteProps.esquema)
+  useEffect(()=>{
+    console.log("dentro de los Pacientes")
+    return(
+      console.log("Saliendo del componente")
+    )
+  })
+
+  return(
+    <React.Fragment>
+    <h1>Reporte</h1>
+    <div class="flexy">
+    <div class="flex-container">
+    {capturas.slice(0).map((photo, index) => (
+      <Card interactive={true} elevation={Elevation.TWO} key={photo.id} style={{width: "250px", margin: "20px"}}>
+        <img style={{width: "250px", margin: "-20px"}} src={photo.captura}/>
+        <h3>{photo.identificador}-{photo.descripcion}</h3>
+      </Card>
+    ))}
+    </div>
+    <div class="c"  >
+      <img style={{width: "400px"}} src={esquema}/>
+    </div>
+    </div>
+
+    <div class="reporte">
+    <h1>Reporte</h1>
+    <p>lorem </p>
+
+    </div>
+    
     </React.Fragment>
     )    
 }
@@ -180,22 +286,26 @@ const Videos = ({location}, props) => {
         <div class="bp3-input-group">
         <input type="text" class="bp3-input" placeholder="Lugar del organo..." ref={areaOrgano}/>
         <button onClick={capture} class="bp3-button bp3-minimal bp3-icon-camera"/>
+
+        <NavLink 
+        to={{pathname:'/esquema',
+            esquemaProps:{
+              photos: photos,
+              sesion: sesion
+            }}}>
+        <button class="bp3-button bp3-minimal bp3-icon-desktop"/>
+        </NavLink>
+        
         </div>
         </div>
         <br/>
-        <Webcam audio={false} videoConstraints={{ deviceId: deviceId }} ref={webcamRef} screenshotFormat="image/jpeg" />  
+        <Webcam audio={false} videoConstraints={{ deviceId: deviceId }} ref={webcamRef} screenshotFormat="image/jpeg" />
+
         </React.Fragment>
         : <h1>Rellene el fomulario y seleccione fuente capturadora</h1>
       }
 
-      <NavLink 
-      to={{pathname:'/esquema',
-          esquemaProps:{
-            photos: photos,
-            sesion: sesion
-          }}}>
-      <button class="bp3-button bp3-minimal bp3-icon-desktop"/>
-      </NavLink>
+
 
       <table class="bp3-html-table bp3-html-table-bordered bp3-html-table-condensed bp3-html-table-striped bp3-interactive bp3-small">
       <thead>

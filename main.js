@@ -60,7 +60,7 @@ app.on('ready', () => {
         event.returnValue = 'dato insertado'
       })
 
-      ipcMain.on('add-sesion', (event, arg) => {
+    ipcMain.on('add-sesion', (event, arg) => {
         const knex = require('knex')(options);
         knex('sesiones').insert({ 
             paciente: arg.paciente,
@@ -75,7 +75,7 @@ app.on('ready', () => {
         });
       })
 
-      ipcMain.on('add-esquema', (event, arg) => {
+    ipcMain.on('add-esquema', (event, arg) => {
         const knex = require('knex')(options);
         knex('sesiones').where({ 'id': arg.id })
         .update({ esquema: arg.esquema })
@@ -86,8 +86,7 @@ app.on('ready', () => {
         event.returnValue = 'esquema insertado'
       })
 
-
-      ipcMain.on('add-captura', (event, arg) => {
+    ipcMain.on('add-captura', (event, arg) => {
         const knex = require('knex')(options);
         knex('captura').insert({ 
             sesion: arg.sesion,
@@ -104,8 +103,7 @@ app.on('ready', () => {
         });
       })
     
-      
-      ipcMain.on('get-pacientes', (event, arg) => {
+    ipcMain.on('get-pacientes', (event, arg) => {
         const knex = require('knex')(options);
         var pacientes=[];
         knex.from('paciente').select("*")
@@ -129,8 +127,51 @@ app.on('ready', () => {
             knex.destroy();
         });
       })
+
+    ipcMain.on('get-sesiones', (event, arg) => {
+        const knex = require('knex')(options);
+        var sesiones=[];
+        knex.from('sesiones').select("*")
+        .where({ paciente: arg.user_id })
+        .then((rows) => {
+            for (row of rows) {
+                var sesion = {
+                    id: row.id, 
+                    fecha: row.fecha,
+                    esquema: row.esquema,
+                };
+                sesiones.push(sesion);
+            }
+            event.returnValue = sesiones
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
     
-  });
+    ipcMain.on('get-capturas', (event, arg) => {
+        const knex = require('knex')(options);
+        var capturas=[];
+        knex.from('captura').select("*")
+        .where({ sesion: arg.sesion_id })
+        .then((rows) => {
+            for (row of rows) {
+                var captura = {
+                    id: row.id, 
+                    identificador: row.identificador,
+                    captura: row.captura,
+                    descripcion: row.descripcion,
+                };
+                capturas.push(captura);
+            }
+            event.returnValue = capturas
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+    })
+    
+});
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
