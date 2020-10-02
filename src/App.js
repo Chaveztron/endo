@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Route, NavLink } from 'react-router-dom'
 import queryString from 'query-string'
 import './App.css'
@@ -6,6 +6,7 @@ import { Button, Card, Elevation } from "@blueprintjs/core";
 import Webcam from "react-webcam";
 import { Form, Input, Select, NumInput, Radios, DatePiker } from "./components";
 import HomePage from "./esquemaJs/HomePage";
+import { useReactToPrint } from 'react-to-print';
 const { ipcRenderer } = window.require("electron");
 
 const App = () => {
@@ -185,17 +186,17 @@ const Reportes = (props) => {
     sesion_id:  props.location.reporteProps.estudios_id
   }))
   const [esquema, setEsquema] = React.useState(props.location.reporteProps.esquema)
-  useEffect(()=>{
-    console.log("dentro de los Pacientes")
-    return(
-      console.log("Saliendo del componente")
-    )
-  })
+
+    const componentRef = useRef();
+    const handlePrint = useReactToPrint({
+      content: () => componentRef.current,
+    });
 
   return(
     <React.Fragment>
     <h1>Reporte</h1>
-    <div class="flexy">
+    <div ref={componentRef}>
+    <div class="flexy" >
     <div class="flex-container">
     {capturas.slice(0).map((photo, index) => (
       <Card interactive={true} elevation={Elevation.TWO} key={photo.id} style={{width: "250px", margin: "20px"}}>
@@ -212,9 +213,9 @@ const Reportes = (props) => {
     <div class="reporte">
     <h1>Reporte</h1>
     <p>lorem </p>
-
+    <button onClick={handlePrint}>Print this out!</button>
     </div>
-    
+    </div>
     </React.Fragment>
     )    
 }
