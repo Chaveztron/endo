@@ -7,6 +7,8 @@ import Webcam from "react-webcam";
 import { Form, Input, Select, NumInput, Radios, DatePiker } from "./components";
 import HomePage from "./esquemaJs/HomePage";
 import { useReactToPrint } from 'react-to-print';
+import { Container, Row, Col, Card as Card2 } from "react-bootstrap";
+
 const { ipcRenderer } = window.require("electron");
 
 const App = () => {
@@ -194,28 +196,110 @@ const Reportes = (props) => {
 
   return(
     <React.Fragment>
-    <h1>Reporte</h1>
-    <div ref={componentRef}>
-    <div class="flexy" >
-    <div class="flex-container">
-    {capturas.slice(0).map((photo, index) => (
-      <Card interactive={true} elevation={Elevation.TWO} key={photo.id} style={{width: "250px", margin: "20px"}}>
-        <img style={{width: "250px", margin: "-20px"}} src={photo.captura}/>
-        <h3>{photo.identificador}-{photo.descripcion}</h3>
-      </Card>
-    ))}
-    </div>
-    <div class="c"  >
-      <img style={{width: "400px"}} src={esquema}/>
-    </div>
-    </div>
-
-    <div class="reporte">
-    <h1>Reporte</h1>
-    <p>lorem </p>
     <button onClick={handlePrint}>Print this out!</button>
-    </div>
-    </div>
+    <Container ref={componentRef}>
+    <Row>
+      <Col
+        auto
+        xs={3}
+        style={{ backgroundColor: "rgba(73,155,234,1)", margin: "10px" }}
+      >
+        <img
+          src="http://endoclinik.com.mx/wp-content/uploads/2019/05/logobalnco.png"
+          style={{ width: "230px" }}
+        />
+      </Col>
+      <Col
+        auto
+        style={{ background: "rgba(212,228,239,1)", margin: "10px" }}
+      >
+        <div
+          style={{
+            margin: "10px",
+            marginLeft: "20%",
+            alignContent: "center"
+          }}
+        >
+          INFORME DEL ESTUDIO ENDOCLINIC
+          <h6>SERVICIO DE ENDOSCOPIA</h6>
+        </div>
+      </Col>
+    </Row>
+    <Row>
+      <Col style={{ marginRight: "-110px" }}>
+        <b>Paciente:</b>
+        <br />
+        <b>Edad:</b>
+        <br />
+        <b>Diag. Preliminar:</b>
+        <br />
+        <b>Referido por:</b>
+        <br />
+        <b>Procedimiento:</b>
+        <br />
+        <b>Fecha del estudio:</b>
+        <br />
+        <b>Sedacion:</b>
+        <br />
+      </Col>
+      <Col auto>
+        CHAVEZ CARO JESUS
+        <br />
+        73 AÑOS
+        <br />
+        HEMATOQUESIA
+        <br />
+        DRA MENA
+        <br />
+        Colonoscopia
+        <br />
+        26/MAYO/2020 03:21 PM
+        <br />
+        Butilhioscina, Ketorolaco, Midazolam
+        <br />
+      </Col>
+      <Col>
+        <img
+          src={esquema}
+          style={{ width: "300px" }}
+        />
+      </Col>
+    </Row>
+
+    <Row>
+    {capturas.slice(0).map((photo, index) => (
+      <Col xs={{ order: photo.id }}>
+        <Card2 style={{ width: "15rem" }}>
+          <Card2.Img
+            variant="top"
+            src={photo.captura}
+            style={{ width: "230px" }}
+          />
+          <Card2.Footer>
+            <h6>{photo.identificador}-{photo.descripcion}</h6>
+          </Card2.Footer>
+        </Card2>
+      </Col>
+    ))}
+      </Row>
+
+    <Row>
+      <Col>
+        <h2>Hallazgos</h2>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmSod tempor incididunt ut labore et dolore magna aliqua. Ut
+          enim ad minim veniam, quis nostrud exercitation ullamco laboris
+          nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+          reprehenderit in voluptate velit esse cillum dolore eu fugiat
+          nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+          sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+      </Col>
+    </Row>
+  </Container>
+
+
     </React.Fragment>
     )    
 }

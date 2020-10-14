@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@blueprintjs/core": "^3.30.0",
+    "bootstrap": "^4.5.3",
     "electron-is-dev": "^1.2.0",
     "knex": "^0.21.2",
     "konva": "^7.0.5",
