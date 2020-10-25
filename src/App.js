@@ -168,6 +168,8 @@ const Estudios = (props) => {
             <NavLink
             to={{pathname:'/reportes',
             reporteProps:{
+              fechaEstudio:estudio.fecha,
+              paciente: props.location.estudiosProps.user_id,
               estudios_id: estudio.id,
               esquema: estudio.esquema
             }}}
@@ -188,11 +190,18 @@ const Reportes = (props) => {
     sesion_id:  props.location.reporteProps.estudios_id
   }))
   const [esquema, setEsquema] = React.useState(props.location.reporteProps.esquema)
+  const paciente = ipcRenderer.sendSync('get-paciente', {
+    paciente_id:  props.location.reporteProps.paciente
+  })
+  let now = new Date().getTime();
 
     const componentRef = useRef();
     const handlePrint = useReactToPrint({
       content: () => componentRef.current,
     });
+
+  var fecha = (paciente.nacimiento).split("-");
+  var anoNacimiento = fecha[0]
 
   return(
     <React.Fragment>
@@ -243,9 +252,14 @@ const Reportes = (props) => {
         <br />
       </Col>
       <Col auto>
-        CHAVEZ CARO JESUS
+      { (paciente.apellido_paterno+" "
+      +paciente.apellido_materno+" "
+      +paciente.nombre).toUpperCase() }
         <br />
-        73 AÑOS
+        {parseInt(new Intl.DateTimeFormat("default", {
+          year: "numeric"
+        }).format(now)) - parseInt(anoNacimiento)} AÑOS
+        
         <br />
         HEMATOQUESIA
         <br />
@@ -253,7 +267,19 @@ const Reportes = (props) => {
         <br />
         Colonoscopia
         <br />
-        26/MAYO/2020 03:21 PM
+        {new Intl.DateTimeFormat("default", {
+          day: "2-digit"
+        }).format(props.location.reporteProps.fechaEstudio)}/
+        {new Intl.DateTimeFormat("default", {
+          month: "long"
+        }).format(props.location.reporteProps.fechaEstudio)}/
+        {new Intl.DateTimeFormat("default", {
+          year: "numeric"
+        }).format(props.location.reporteProps.fechaEstudio)} {new Intl.DateTimeFormat("default", {
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric'
+        }).format(props.location.reporteProps.fechaEstudio)}
         <br />
         Butilhioscina, Ketorolaco, Midazolam
         <br />

@@ -170,7 +170,32 @@ app.on('ready', () => {
             knex.destroy();
         });
     })
-    
+   
+    ipcMain.on('get-paciente', (event, arg) => {
+        const knex = require('knex')(options);
+        var paciente;
+        knex.from('paciente').select("*")
+        .where({ id: arg.paciente_id })
+        .then((rows) => {
+            for (row of rows) {
+                var paciente_row = {
+                    id: row.id, 
+                    nombre: row.nombre,
+                    apellido_paterno: row.apellido_paterno,
+                    apellido_materno: row.apellido_materno,
+                    genero: row.genero,
+                    nacimiento: row.nacimiento,
+                    telefono: row.telefono,
+                    sexo: row.sexo
+                };
+                paciente = paciente_row;
+            }
+            event.returnValue = paciente
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+    })
 });
 
 app.on('window-all-closed', () => {
