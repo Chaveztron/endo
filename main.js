@@ -86,6 +86,17 @@ app.on('ready', () => {
         event.returnValue = 'esquema insertado'
       })
 
+    ipcMain.on('add-hallazgo', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('sesiones').where({ 'id': arg.id })
+        .update({ hallazgo: arg.hallazgo })
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+        event.returnValue = 'hallazgo insertado'
+    })
+
     ipcMain.on('add-captura', (event, arg) => {
         const knex = require('knex')(options);
         knex('captura').insert({ 
@@ -139,6 +150,7 @@ app.on('ready', () => {
                     id: row.id, 
                     fecha: row.fecha,
                     esquema: row.esquema,
+                    hallazgo: row.hallazgo,
                 };
                 sesiones.push(sesion);
             }

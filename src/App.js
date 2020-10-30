@@ -8,6 +8,9 @@ import { Form, Input, Select, NumInput, Radios, DatePiker } from "./components";
 import HomePage from "./esquemaJs/HomePage";
 import { useReactToPrint } from 'react-to-print';
 import { Container, Row, Col, Card as Card2 } from "react-bootstrap";
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import ReactHtmlParser from 'react-html-parser';
 
 const { ipcRenderer } = window.require("electron");
 
@@ -171,7 +174,8 @@ const Estudios = (props) => {
               fechaEstudio:estudio.fecha,
               paciente: props.location.estudiosProps.user_id,
               estudios_id: estudio.id,
-              esquema: estudio.esquema
+              esquema: estudio.esquema,
+              hallazgo: estudio.hallazgo
             }}}
             >
             <button class="bp3-button bp3-minimal bp3-icon-print"/>
@@ -193,6 +197,7 @@ const Reportes = (props) => {
   const paciente = ipcRenderer.sendSync('get-paciente', {
     paciente_id:  props.location.reporteProps.paciente
   })
+  const hallazgo = props.location.reporteProps.hallazgo
   let now = new Date().getTime();
 
     const componentRef = useRef();
@@ -313,13 +318,7 @@ const Reportes = (props) => {
       <Col>
         <h2>Hallazgos</h2>
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmSod tempor incididunt ut labore et dolore magna aliqua. Ut
-          enim ad minim veniam, quis nostrud exercitation ullamco laboris
-          nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat
-          nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-          sunt in culpa qui officia deserunt mollit anim id est laborum.
+          {ReactHtmlParser(hallazgo)}
         </p>
       </Col>
     </Row>
@@ -446,6 +445,7 @@ const Esquema = (props) => {
   const [photos, setPhotos] = React.useState(props.location.esquemaProps.photos)
   const [sesion, setSesion] = React.useState(props.location.esquemaProps.sesion)
   const [esquema, setEsquema] = React.useState("")
+  const [hallazgo, setHallazgo] = React.useState("")
 
   useEffect(()=>{
     console.log("dentro de Esquema")
@@ -469,10 +469,19 @@ const updateFieldChanged = index => e => {
   setPhotos(newArr); // ??
 }
 
+const handleOnChage = (e, editor) => {
+  setHallazgo(editor.getData())
+}
+
 const guardar = () => {
   console.log(ipcRenderer.sendSync('add-esquema', {
     id: sesion,
     esquema: esquema,
+  }))
+
+  console.log(ipcRenderer.sendSync('add-hallazgo', {
+    id: sesion,
+    hallazgo: hallazgo,
   }))
 
   photos.map((photo) => ( 
@@ -506,6 +515,12 @@ const guardar = () => {
     </div>
     <button onClick={guardar} class="bp3-button bp3-minimal bp3-icon-camera"/>
     </div>
+
+    <CKEditor
+      editor={ClassicEditor}
+      onChange={handleOnChage}
+    />
+
     </React.Fragment>
     )    
 }
