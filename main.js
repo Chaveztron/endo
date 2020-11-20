@@ -209,7 +209,49 @@ app.on('ready', () => {
         });
     })
 
-    
+    ipcMain.on('add-doctor', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('doctor').insert({ 
+            doctor: arg.doctor,
+        }).returning('id')
+        .then(function (id) {
+        event.returnValue = id
+        })
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
+
+    ipcMain.on('get-doctores', (event, arg) => {
+        const knex = require('knex')(options);
+        var doctores=[];
+        knex.from('doctor').select("*")
+        .then((rows) => {
+            for (row of rows) {
+                var doctor = {
+                    id: row.id, 
+                    doctor: row.doctor,
+                };
+                doctores.push(doctor);
+            }
+            event.returnValue = doctores
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
+
+    ipcMain.on('del-doctor', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('doctor').where({ 'id': arg.id })
+        .del()
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+        event.returnValue = 'borrado de la base de datos'
+    })
 });
 
 app.on('window-all-closed', () => {

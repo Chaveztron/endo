@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Route, NavLink } from 'react-router-dom'
 import queryString from 'query-string'
 import './App.css'
-import { Button, Card, Elevation } from "@blueprintjs/core";
+import { Button, Card, Elevation, ControlGroup, InputGroup } from "@blueprintjs/core";
 import Webcam from "react-webcam";
 import { Form, Input, Select, NumInput, Radios, DatePiker } from "./components";
 import HomePage from "./esquemaJs/HomePage";
 import { useReactToPrint } from 'react-to-print';
-import { Container, Row, Col, Card as Card2 } from "react-bootstrap";
+import { Container, Row, Col, Card as Card2, Form as BForm } from "react-bootstrap";
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import ReactHtmlParser from 'react-html-parser';
@@ -76,13 +76,54 @@ const Add_paciente = (props) => {
 }
 
 const Configuracion = (props) => {
- 
-  
+  const [doctores, setDoctores] = useState(ipcRenderer.sendSync('get-doctores'));
+  const [name, setName] = useState("");
+
+  const handleSubmit = (evt) => {
+    evt.preventDefault();
+    var idTemp = ipcRenderer.sendSync('add-doctor', {
+      doctor: name,
+    })
+    setDoctores(doctores => [...doctores,{id: idTemp, doctor: name}])      
+  }
+
+  const deleteItem = (i) => {
+    console.log(ipcRenderer.sendSync('del-doctor', {
+      id: doctores[i].id,
+    }))
+    const newDoctores = [...doctores]
+    newDoctores.splice(i, 1)
+    setDoctores(newDoctores)
+  }
+
 
   return(
     <React.Fragment>
       <h1>Configuracion</h1>
+
+
+
+    <form onSubmit={handleSubmit}>
+    <ControlGroup fill={false} vertical={false}>
+    <InputGroup 
+      placeholder="Nombre de la doctora"
+      type="text"
+      value={name}
+      onChange={e => setName(e.target.value)} 
+    />
+    <Button icon="add" type="submit" value="Submit">Agregar Doctor@</Button>
+    </ControlGroup>
+    </form>
+
+    <ul>
+    {doctores.map((doctor, index) => (
       
+      <li>{doctor.id} {doctor.doctor}
+      <button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
+      </li>
+      
+    ))}
+    </ul>
     </React.Fragment>
   )
 }
