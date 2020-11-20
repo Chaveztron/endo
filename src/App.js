@@ -27,6 +27,7 @@ const App = () => {
         <div class="bp3-navbar-group bp3-align-right">
         <NavLink to='/' exact activeClassName='active'><button class="bp3-button bp3-minimal bp3-intent-success bp3-icon-add">Agregar paciente</button></NavLink>
         <NavLink to='/Pacientes' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-database">Pacientes</button></NavLink>
+        <NavLink to='/configuracion' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-cog">Configuracion</button></NavLink>
           <span class="bp3-navbar-divider"></span>
           <button class="bp3-button bp3-minimal bp3-icon-user"></button>
           <button class="bp3-button bp3-minimal bp3-icon-notifications"></button>
@@ -39,6 +40,7 @@ const App = () => {
       <Route path='/esquema' render={(props)=> <Esquema {...props} />} />
       <Route path='/estudios' render={(props)=> <Estudios {...props} />} />
       <Route path='/reportes' render={(props)=> <Reportes {...props} />} />
+      <Route path='/configuracion' render={(props)=> <Configuracion {...props} />} />
     </BrowserRouter>
   )
 }
@@ -72,6 +74,19 @@ const Add_paciente = (props) => {
     </React.Fragment>
   )
 }
+
+const Configuracion = (props) => {
+ 
+  
+
+  return(
+    <React.Fragment>
+      <h1>Configuracion</h1>
+      
+    </React.Fragment>
+  )
+}
+
 
 const Pacientes = (props) => {
   const [users, setUser] = useState(ipcRenderer.sendSync('get-pacientes'))
@@ -379,7 +394,7 @@ const Videos = ({location}, props) => {
   }
   let myArray = [];
   devices.map((device) => (
-    myArray.push(device.deviceId)
+    myArray.push([device.deviceId, device.label])
   ))
 
   return (
@@ -387,6 +402,9 @@ const Videos = ({location}, props) => {
       <h1>Endoscopía</h1>
       <h2>ID: { id }</h2>
       <Form onSubmit={onSubmit}>
+
+
+
         <Select name="Device" options={myArray} />
         <Button type="submit" value="Submit" >Seleccionar</Button>
       </Form>

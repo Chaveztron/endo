@@ -60,8 +60,8 @@ export function Select({ register, options, name, ...rest }) {
 <div class="bp3-select" >
     <select name={name} ref={register} {...rest}>
       {options.map(value => (
-        <option key={value} value={value}>
-          {value}
+        <option key={value[0]} value={value[0]}>
+          {value[1]}
         </option>
       ))}
     </select>

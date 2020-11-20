@@ -208,6 +208,8 @@ app.on('ready', () => {
             knex.destroy();
         });
     })
+
+    
 });
 
 app.on('window-all-closed', () => {
