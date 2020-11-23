@@ -252,6 +252,95 @@ app.on('ready', () => {
         });
         event.returnValue = 'borrado de la base de datos'
     })
+
+    ipcMain.on('add-procedimiento', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('procedimiento').insert({ 
+            procedimiento: arg.procedimiento,
+        }).returning('id')
+        .then(function (id) {
+        event.returnValue = id
+        })
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
+
+    ipcMain.on('get-procedimientos', (event, arg) => {
+        const knex = require('knex')(options);
+        var procedimientos=[];
+        knex.from('procedimiento').select("*")
+        .then((rows) => {
+            for (row of rows) {
+                var procedimiento = {
+                    id: row.id, 
+                    procedimiento: row.procedimiento,
+                };
+                procedimientos.push(procedimiento);
+            }
+            event.returnValue = procedimientos
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
+
+    ipcMain.on('del-procedimiento', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('procedimiento').where({ 'id': arg.id })
+        .del()
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+        event.returnValue = 'borrado de la base de datos'
+    })
+
+    ipcMain.on('add-sedante', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('sedante').insert({ 
+            sedante: arg.sedante,
+        }).returning('id')
+        .then(function (id) {
+        event.returnValue = id
+        })
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
+
+    ipcMain.on('get-sedantes', (event, arg) => {
+        const knex = require('knex')(options);
+        var sedantes=[];
+        knex.from('sedante').select("*")
+        .then((rows) => {
+            for (row of rows) {
+                var sedante = {
+                    id: row.id, 
+                    sedante: row.sedante,
+                };
+                sedantes.push(sedante);
+            }
+            event.returnValue = sedantes
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
+
+      ipcMain.on('del-sedante', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('sedante').where({ 'id': arg.id })
+        .del()
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+        event.returnValue = 'borrado de la base de datos'
+    })
+
 });
 
 app.on('window-all-closed', () => {

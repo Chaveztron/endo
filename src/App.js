@@ -77,17 +77,31 @@ const Add_paciente = (props) => {
 
 const Configuracion = (props) => {
   const [doctores, setDoctores] = useState(ipcRenderer.sendSync('get-doctores'));
-  const [name, setName] = useState("");
+  const [doctor, setDoctor] = useState("");
+  const [procedimientos, setProcedimientos] = useState(ipcRenderer.sendSync('get-procedimientos'));
+  const [procedimiento, setProcedimiento] = useState("");
+  const [sedantes, setSedantes] = useState(ipcRenderer.sendSync('get-sedantes'));
+  const [sedante, setSedante] = useState("");
 
-  const handleSubmit = (evt) => {
+  const handleSubmitDoctor = (evt) => {
     evt.preventDefault();
-    var idTemp = ipcRenderer.sendSync('add-doctor', {
-      doctor: name,
-    })
-    setDoctores(doctores => [...doctores,{id: idTemp, doctor: name}])      
+    var idTemp = ipcRenderer.sendSync('add-doctor', { doctor: doctor })
+    setDoctores(doctores => [...doctores,{id: idTemp, doctor: doctor}])      
   }
 
-  const deleteItem = (i) => {
+  const handleSubmitProcedimiento = (evt) => {
+    evt.preventDefault();
+    var idTemp = ipcRenderer.sendSync('add-procedimiento', { procedimiento: procedimiento })
+    setProcedimientos(procedimientos => [...procedimientos,{id: idTemp, procedimiento: procedimiento}])      
+  }
+
+  const handleSubmitSedante = (evt) => {
+    evt.preventDefault();
+    var idTemp = ipcRenderer.sendSync('add-sedante', { sedante: sedante })
+    setSedantes(sedantes => [...sedantes,{id: idTemp, sedante: sedante }])      
+  }
+
+  const deleteDoctor = (i) => {
     console.log(ipcRenderer.sendSync('del-doctor', {
       id: doctores[i].id,
     }))
@@ -96,38 +110,80 @@ const Configuracion = (props) => {
     setDoctores(newDoctores)
   }
 
+  const deleteProcedimiento = (i) => {
+    console.log(ipcRenderer.sendSync('del-procedimiento', {
+      id: procedimientos[i].id,
+    }))
+    const newProcedimientos = [...procedimientos]
+    newProcedimientos.splice(i, 1)
+    setProcedimientos(newProcedimientos)
+  }
+
+  const deleteSedante = (i) => {
+    console.log(ipcRenderer.sendSync('del-sedante', {
+      id: sedantes[i].id,
+    }))
+    const newSedantes = [...sedantes]
+    newSedantes.splice(i, 1)
+    setSedantes(newSedantes)
+  }
 
   return(
     <React.Fragment>
       <h1>Configuracion</h1>
 
-
-
-    <form onSubmit={handleSubmit}>
-    <ControlGroup fill={false} vertical={false}>
-    <InputGroup 
-      placeholder="Nombre de la doctora"
-      type="text"
-      value={name}
-      onChange={e => setName(e.target.value)} 
-    />
-    <Button icon="add" type="submit" value="Submit">Agregar Doctor@</Button>
-    </ControlGroup>
+    <form onSubmit={handleSubmitDoctor}>
+        <ControlGroup fill={false} vertical={false}>
+        <InputGroup placeholder="Nombre de la doctora" type="text" value={doctor}
+          onChange={e => setDoctor(e.target.value)} 
+        />
+        <Button icon="add" type="submit" value="Submit">Agregar Doctor@</Button>
+        </ControlGroup>
     </form>
-
     <ul>
-    {doctores.map((doctor, index) => (
-      
+    {doctores.map((doctor, index) => (      
       <li>{doctor.id} {doctor.doctor}
-      <button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
+      <button onClick={() => deleteDoctor(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
       </li>
-      
     ))}
     </ul>
+
+    <form onSubmit={handleSubmitProcedimiento}>
+          <ControlGroup fill={false} vertical={false}>
+          <InputGroup placeholder="Procedimiento" type="text" value={procedimiento}
+            onChange={e => setProcedimiento(e.target.value)} 
+          />
+          <Button icon="add" type="submit" value="Submit">Agregar Procedimiento</Button>
+          </ControlGroup>
+      </form>
+      <ul>
+      {procedimientos.map((procedimiento, index) => (      
+        <li>{procedimiento.id} {procedimiento.procedimiento}
+        <button onClick={() => deleteProcedimiento(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
+        </li>
+      ))}
+      </ul>
+
+      <form onSubmit={handleSubmitSedante}>
+          <ControlGroup fill={false} vertical={false}>
+          <InputGroup placeholder="Procedimiento" type="text" value={sedante}
+            onChange={e => setSedante(e.target.value)} 
+          />
+          <Button icon="add" type="submit" value="Submit">Agregar Grupo de sedante</Button>
+          </ControlGroup>
+      </form>
+      <ul>
+      {sedantes.map((sedante, index) => (      
+        <li>{sedante.id} {sedante.sedante}
+        <button onClick={() => deleteSedante(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
+        </li>
+      ))}
+      </ul>
+
+    
     </React.Fragment>
   )
 }
-
 
 const Pacientes = (props) => {
   const [users, setUser] = useState(ipcRenderer.sendSync('get-pacientes'))
@@ -444,8 +500,7 @@ const Videos = ({location}, props) => {
       <h2>ID: { id }</h2>
       <Form onSubmit={onSubmit}>
 
-
-
+  
         <Select name="Device" options={myArray} />
         <Button type="submit" value="Submit" >Seleccionar</Button>
       </Form>
