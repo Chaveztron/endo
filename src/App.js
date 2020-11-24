@@ -254,6 +254,7 @@ const Estudios = (props) => {
     )
   })
 
+  console.log(estudios)
   return(
     <React.Fragment>
     <h1>Sesiones</h1>
@@ -287,7 +288,10 @@ const Estudios = (props) => {
               paciente: props.location.estudiosProps.user_id,
               estudios_id: estudio.id,
               esquema: estudio.esquema,
-              hallazgo: estudio.hallazgo
+              hallazgo: estudio.hallazgo,
+              doctor: estudio.doctor,
+              procedimiento: estudio.procedimiento,
+              sedante: estudio.sedante
             }}}
             >
             <button class="bp3-button bp3-minimal bp3-icon-print"/>
@@ -310,6 +314,10 @@ const Reportes = (props) => {
     paciente_id:  props.location.reporteProps.paciente
   })
   const hallazgo = props.location.reporteProps.hallazgo
+  const doctor = ipcRenderer.sendSync('get-doctor', {doctor_id: props.location.reporteProps.doctor})
+  const procedimiento = ipcRenderer.sendSync('get-procedimiento', {procedimiento_id: props.location.reporteProps.procedimiento})
+  const sedante = ipcRenderer.sendSync('get-sedante', {sedante_id: props.location.reporteProps.sedante})
+
   let now = new Date().getTime();
 
     const componentRef = useRef();
@@ -357,8 +365,7 @@ const Reportes = (props) => {
         <br />
         <b>Edad:</b>
         <br />
-        <b>Diag. Preliminar:</b>
-        <br />
+
         <b>Referido por:</b>
         <br />
         <b>Procedimiento:</b>
@@ -378,11 +385,9 @@ const Reportes = (props) => {
         }).format(now)) - parseInt(anoNacimiento)} AÑOS
         
         <br />
-        HEMATOQUESIA
+        {(doctor.doctor).toUpperCase()}
         <br />
-        DRA MENA
-        <br />
-        Colonoscopia
+        {procedimiento.procedimiento}
         <br />
         {new Intl.DateTimeFormat("default", {
           day: "2-digit"
@@ -398,7 +403,7 @@ const Reportes = (props) => {
           second: 'numeric'
         }).format(props.location.reporteProps.fechaEstudio)}
         <br />
-        Butilhioscina, Ketorolaco, Midazolam
+        {sedante.sedante}
         <br />
       </Col>
       <Col>
@@ -446,6 +451,7 @@ const Videos = ({location}, props) => {
   const [devices, setDevices] = React.useState([]);
   const [photos, setPhotos] = React.useState([]);
   const [sesion, setSesion] = React.useState("")
+  
   const handleDevices = React.useCallback(
     mediaDevices =>
       setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput")),
@@ -476,6 +482,7 @@ const Videos = ({location}, props) => {
   )
   console.log(location)
   const { id } = queryString.parse(location.search)
+  
   const onSubmit = data => {
     setDeviceId(data.Device)
     let now = new Date().getTime();
@@ -485,6 +492,9 @@ const Videos = ({location}, props) => {
     setSesion(ipcRenderer.sendSync('add-sesion', {
       paciente: id,
       fecha: now,
+      doctor: data.Doctor_encargado,
+      procedimiento: data.Procedimiento,
+      sedante: data.Sedantes
     }))
 
 
@@ -494,15 +504,32 @@ const Videos = ({location}, props) => {
     myArray.push([device.deviceId, device.label])
   ))
 
+  let doctorArray = [];
+  (ipcRenderer.sendSync('get-doctores')).map((doctor) =>(
+    doctorArray.push([doctor.id, doctor.doctor])
+  ))
+
+  let procedimientoArray = [];
+  (ipcRenderer.sendSync('get-procedimientos')).map((procedimiento) =>(
+    procedimientoArray.push([procedimiento.id, procedimiento.procedimiento])
+  ))
+
+  let sedanteArray = [];
+  (ipcRenderer.sendSync('get-sedantes')).map((sedante) =>(
+    sedanteArray.push([sedante.id, sedante.sedante])
+  ))
+
+
   return (
     <React.Fragment>
       <h1>Endoscopía</h1>
       <h2>ID: { id }</h2>
       <Form onSubmit={onSubmit}>
-
-  
+        <Select name="Doctor_encargado" options={doctorArray} />
+        <Select name="Procedimiento" options={procedimientoArray} />
+        <Select name="Sedantes" options={sedanteArray} />
         <Select name="Device" options={myArray} />
-        <Button type="submit" value="Submit" >Seleccionar</Button>
+        <Button type="submit" value="Submit" >Comenzar estudio</Button>
       </Form>
       {deviceId
         ?  <React.Fragment>
