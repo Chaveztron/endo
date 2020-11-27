@@ -142,6 +142,17 @@ app.on('ready', () => {
         });
       })
 
+    ipcMain.on('del-paciente', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('paciente').where({ 'id': arg.id })
+        .del()
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+        event.returnValue = 'borrado de la base de datos'
+    })
+
     ipcMain.on('get-sesiones', (event, arg) => {
         const knex = require('knex')(options);
         var sesiones=[];
@@ -151,6 +162,48 @@ app.on('ready', () => {
             for (row of rows) {
                 var sesion = {
                     id: row.id, 
+                    fecha: row.fecha,
+                    esquema: row.esquema,
+                    hallazgo: row.hallazgo,
+                    doctor: row.doctor,
+                    procedimiento: row.procedimiento,
+                    sedante: row.sedante
+                };
+                sesiones.push(sesion);
+            }
+            event.returnValue = sesiones
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
+
+    ipcMain.on('del-sesion', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('sesiones').where({ 'id': arg.id })
+        .del()
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+        knex('captura').where({ 'sesion': arg.id })
+        .del()
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+        event.returnValue = 'borrado de la base de datos'
+    })
+    
+    ipcMain.on('get-todas_sesiones', (event, arg) => {
+        const knex = require('knex')(options);
+        var sesiones=[];
+        knex.from('sesiones').select("*")
+        .then((rows) => {
+            for (row of rows) {
+                var sesion = {
+                    id: row.id,
+                    paciente: row.paciente, 
                     fecha: row.fecha,
                     esquema: row.esquema,
                     hallazgo: row.hallazgo,
@@ -376,7 +429,7 @@ app.on('ready', () => {
         });
       })
 
-      ipcMain.on('get-sedante', (event, arg) => {
+    ipcMain.on('get-sedante', (event, arg) => {
         const knex = require('knex')(options);
         var sedante;
         knex.from('sedante').select("*")

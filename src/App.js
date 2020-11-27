@@ -27,6 +27,7 @@ const App = () => {
         <div class="bp3-navbar-group bp3-align-right">
         <NavLink to='/' exact activeClassName='active'><button class="bp3-button bp3-minimal bp3-intent-success bp3-icon-add">Agregar paciente</button></NavLink>
         <NavLink to='/Pacientes' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-database">Pacientes</button></NavLink>
+        <NavLink to='/sesiones' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-document">Sesiones</button></NavLink>
         <NavLink to='/configuracion' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-cog">Configuracion</button></NavLink>
           <span class="bp3-navbar-divider"></span>
           <button class="bp3-button bp3-minimal bp3-icon-user"></button>
@@ -39,6 +40,7 @@ const App = () => {
       <Route path='/videos' render={(props)=> <Videos {...props} />} />
       <Route path='/esquema' render={(props)=> <Esquema {...props} />} />
       <Route path='/estudios' render={(props)=> <Estudios {...props} />} />
+      <Route path='/sesiones' render={(props)=> <Sesiones {...props} />} />
       <Route path='/reportes' render={(props)=> <Reportes {...props} />} />
       <Route path='/configuracion' render={(props)=> <Configuracion {...props} />} />
     </BrowserRouter>
@@ -187,16 +189,27 @@ const Configuracion = (props) => {
 
 const Pacientes = (props) => {
   const [users, setUser] = useState(ipcRenderer.sendSync('get-pacientes'))
-  useEffect(()=>{
-    console.log("dentro de los Pacientes")
-    return(
-      console.log("Saliendo del componente")
-    )
-  })
+
+  const [toggleState, setToggleState] = useState(false)
+
+  const deletePaciente = (i) => {
+      console.log(ipcRenderer.sendSync('del-paciente', {
+        id: users[i].id,
+      }))
+      const newPacientes = [...users]
+      newPacientes.splice(i, 1)
+      setUser(newPacientes)
+  }
+
+  const toggle = () => {
+    setToggleState(toggleState === false ? true : false)
+  }
 
   return(
     <React.Fragment>
     <h1>Pacientes</h1>
+    <button onClick={toggle}>{toggleState?"Cancelar": "Editar"}</button>
+
       <table class="bp3-html-table bp3-html-table-bordered bp3-html-table-condensed bp3-html-table-striped bp3-interactive bp3-small">
       <thead>
         <tr>
@@ -212,7 +225,7 @@ const Pacientes = (props) => {
         </tr>
       </thead>
       <tbody>
-        {users.map(user =>(
+        {users.map((user, index) =>(
           <tr key={user.id}>
             <td>{ user.id }</td>
             <td>{ user.nombre }</td>
@@ -234,6 +247,11 @@ const Pacientes = (props) => {
             >
             <button class="bp3-button bp3-minimal bp3-icon-document"/>
             </NavLink>
+            {toggleState?
+              <React.Fragment>
+              <button onClick={() => deletePaciente(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
+              </React.Fragment>
+            :<button class="bp3-button bp3-minimal bp3-icon-trash" disabled/>}
             </td>
           </tr>
         ))}
@@ -247,17 +265,27 @@ const Estudios = (props) => {
   const [estudios, setEstudios] = useState(ipcRenderer.sendSync('get-sesiones', {
     user_id:  props.location.estudiosProps.user_id
   }))
-  useEffect(()=>{
-    console.log("dentro de los Pacientes")
-    return(
-      console.log("Saliendo del componente")
-    )
-  })
+  const [toggleState, setToggleState] = useState(false)
+
+  const deleteEstudio = (i) => {
+    console.log(ipcRenderer.sendSync('del-sesion', {
+      id: estudios[i].id,
+    }))
+    const newEstudios = [...estudios]
+    newEstudios.splice(i, 1)
+    setEstudios(newEstudios)
+}
+
+const toggle = () => {
+  setToggleState(toggleState === false ? true : false)
+}
+
 
   console.log(estudios)
   return(
     <React.Fragment>
-    <h1>Sesiones</h1>
+    <h1>Estudios</h1>
+    <button onClick={toggle}>{toggleState?"Cancelar": "Editar"}</button>
       <table class="bp3-html-table bp3-html-table-bordered bp3-html-table-condensed bp3-html-table-striped bp3-interactive bp3-small">
       <thead>
         <tr>
@@ -267,7 +295,7 @@ const Estudios = (props) => {
         </tr>
       </thead>
       <tbody>
-        {estudios.map(estudio =>(
+        {estudios.map((estudio,index) =>(
           <tr key={estudio.id}>
             <td>{ estudio.id }</td>
             <td>
@@ -296,6 +324,85 @@ const Estudios = (props) => {
             >
             <button class="bp3-button bp3-minimal bp3-icon-print"/>
             </NavLink>
+            {toggleState?
+              <React.Fragment>
+              <button onClick={() => deleteEstudio(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
+              </React.Fragment>
+            :<button class="bp3-button bp3-minimal bp3-icon-trash" disabled/>}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    </React.Fragment>
+    )    
+}
+
+const Sesiones = (props) => {
+  const [sesiones, setSesiones] = useState(ipcRenderer.sendSync('get-todas_sesiones'))
+  const [toggleState, setToggleState] = useState(false)
+
+  const deleteSesion = (i) => {
+    console.log(ipcRenderer.sendSync('del-sesion', {
+      id: sesiones[i].id,
+    }))
+    const newSesiones = [...sesiones]
+    newSesiones.splice(i, 1)
+    setSesiones(newSesiones)
+}
+
+const toggle = () => {
+  setToggleState(toggleState === false ? true : false)
+}
+
+  console.log(sesiones)
+  return(
+    <React.Fragment>
+    <h1>Sesiones</h1>
+    <button onClick={toggle}>{toggleState?"Cancelar": "Editar"}</button>
+      <table class="bp3-html-table bp3-html-table-bordered bp3-html-table-condensed bp3-html-table-striped bp3-interactive bp3-small">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>Fecha</th>
+          <th>acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sesiones.map((estudio, index) =>(
+          <tr key={estudio.id}>
+            <td>{ estudio.id }</td>
+            <td>
+            {new Intl.DateTimeFormat("default", {
+              year: "numeric",
+              month: "long",
+              day: "2-digit",
+              hour: 'numeric',
+              minute: 'numeric',
+              second: 'numeric'
+            }).format(estudio.fecha)}
+            </td>
+            <td>
+            <NavLink
+            to={{pathname:'/reportes',
+            reporteProps:{
+              fechaEstudio:estudio.fecha,
+              paciente: estudio.paciente,
+              estudios_id: estudio.id,
+              esquema: estudio.esquema,
+              hallazgo: estudio.hallazgo,
+              doctor: estudio.doctor,
+              procedimiento: estudio.procedimiento,
+              sedante: estudio.sedante
+            }}}
+            >
+            <button class="bp3-button bp3-minimal bp3-icon-print"/>
+            </NavLink>
+            {toggleState?
+              <React.Fragment>
+              <button onClick={() => deleteSesion(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
+              </React.Fragment>
+            :<button class="bp3-button bp3-minimal bp3-icon-trash" disabled/>}
             </td>
           </tr>
         ))}
