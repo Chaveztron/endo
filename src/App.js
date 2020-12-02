@@ -68,8 +68,8 @@ const Add_paciente = (props) => {
         <Input name="Apellido_paterno" />
         <Input name="Apellido_materno" />
         <NumInput name="Telefono"/>
-        <Radios name="Sexo" values={["Woman", "Man"]}/>
-        <Select name="Genero" options={["mujer", "hombre"]} />
+        <Radios name="Genero" values={["Hombre", "Mujer"]}/>
+        <Select name="Sexo" options={["mujer", "hombre"]} />
         <DatePiker name="Nacimiento"/>
         <Button type="submit" value="Submit" >Agregar </Button>
       </Form> 
@@ -189,10 +189,30 @@ const Configuracion = (props) => {
 
 const Pacientes = (props) => {
   const [users, setUser] = useState(ipcRenderer.sendSync('get-pacientes'))
-
   const [toggleState, setToggleState] = useState(false)
 
+  const [search, setSearch] = useState('');
+  const [filteredPacientes, setFilteredPacientes] = useState([]);
+
+  useEffect(() => {
+    setFilteredPacientes(
+      users.filter( user => {
+        return (user.nombre.toLowerCase()
+        +user.apellido_paterno.toLowerCase()
+        +user.apellido_materno.toLowerCase()).includes(search.toLowerCase())
+      })
+    )
+  },[search, users])
+
   const deletePaciente = (i) => {
+      let sesiones = (ipcRenderer.sendSync('get-sesiones', {
+        user_id: users[i].id,
+      }))
+      sesiones.map((sesion) => (
+        console.log(ipcRenderer.sendSync('del-sesion', {
+          id: sesion.id,
+        }))
+      ))
       console.log(ipcRenderer.sendSync('del-paciente', {
         id: users[i].id,
       }))
@@ -209,6 +229,12 @@ const Pacientes = (props) => {
     <React.Fragment>
     <h1>Pacientes</h1>
     <button onClick={toggle}>{toggleState?"Cancelar": "Editar"}</button>
+    
+    <input
+    type="text"
+    placeholder="Buscar paciente"
+    onChange={(e) => setSearch(e.target.value)}
+    />
 
       <table class="bp3-html-table bp3-html-table-bordered bp3-html-table-condensed bp3-html-table-striped bp3-interactive bp3-small">
       <thead>
@@ -225,7 +251,7 @@ const Pacientes = (props) => {
         </tr>
       </thead>
       <tbody>
-        {users.map((user, index) =>(
+        {filteredPacientes.map((user, index) =>(
           <tr key={user.id}>
             <td>{ user.id }</td>
             <td>{ user.nombre }</td>
