@@ -58,7 +58,8 @@ const Add_paciente = (props) => {
       nacimiento: data.Nacimiento,
       telefono: data.Telefono,
       sexo: data.Sexo
-    }))    
+    }))
+
   };
   return(
     <React.Fragment>
@@ -606,6 +607,7 @@ const Videos = ({location}, props) => {
       ids = ids + 1
       const imageSrc = webcamRef.current.getScreenshot();
       const lugarOrgano = areaOrgano.current.value
+      areaOrgano.current.value = ""
       console.log(lugarOrgano)
       console.log(imageSrc)
       
@@ -615,6 +617,12 @@ const Videos = ({location}, props) => {
   )
   console.log(location)
   const { id } = queryString.parse(location.search)
+
+  const deleteItem = (i) => {
+    const newPhotos = [...photos]
+    newPhotos.splice(i, 1)
+    setPhotos(newPhotos)
+}
   
   const onSubmit = data => {
     setDeviceId(data.Device)
@@ -629,6 +637,8 @@ const Videos = ({location}, props) => {
       procedimiento: data.Procedimiento,
       sedante: data.Sedantes
     }))
+
+    
 
 
   }
@@ -657,60 +667,56 @@ const Videos = ({location}, props) => {
     <React.Fragment>
       <h1>Endoscopía</h1>
       <h2>ID: { id }</h2>
-      <Form onSubmit={onSubmit}>
-        <Select name="Doctor_encargado" options={doctorArray} />
-        <Select name="Procedimiento" options={procedimientoArray} />
-        <Select name="Sedantes" options={sedanteArray} />
-        <Select name="Device" options={myArray} />
-        <Button type="submit" value="Submit" >Comenzar estudio</Button>
-      </Form>
+
       {deviceId
         ?  <React.Fragment>
-        <div class="bp3-control-group">
-        <div class="bp3-input-group">
-        <input type="text" class="bp3-input" placeholder="Lugar del organo..." ref={areaOrgano}/>
-        <button onClick={capture} class="bp3-button bp3-minimal bp3-icon-camera"/>
-
-        <NavLink 
-        to={{pathname:'/esquema',
-            esquemaProps:{
-              photos: photos,
-              sesion: sesion
-            }}}>
-        <button class="bp3-button bp3-minimal bp3-icon-desktop"/>
-        </NavLink>
-        
-        </div>
-        </div>
-        <br/>
-        <Webcam audio={false} videoConstraints={{ deviceId: deviceId }} ref={webcamRef} screenshotFormat="image/jpeg" />
-
+        <Container fluid>
+            <Row>
+              <Col sm={8}>
+              
+                    <NavLink 
+                    to={{pathname:'/esquema',
+                        esquemaProps:{
+                          photos: photos,
+                          sesion: sesion
+                        }}}>
+                    <Button icon="flow-end" intent="success" large text="Continuar con el estudio"/>
+                    </NavLink>
+                  <br/>
+                    <Webcam audio={false} videoConstraints={{ deviceId: deviceId }} ref={webcamRef} screenshotFormat="image/jpeg" />
+                  <br/>
+                  <input type="text" class="bp3-input bp3-large bp3-fill bp3-round" placeholder="Lugar del organo..." ref={areaOrgano}/> 
+                  <Button icon="camera" intent="primary" large text="Capturar fotografia" onClick={capture}/>
+              
+              </Col>
+              <Col sm={4}>
+                    {photos.slice(0).reverse().map((photo, index) => (
+                      <Card elevation={Elevation.TWO} key={photo.ids} style={{width: "250px", margin: "20px"}}>
+                        <p style={{width: "250px", margin: "-20px", marginBottom: "20px"}}><button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>{photo.ids}</p>
+                        <img style={{width: "250px", margin: "-20px"}} src={photo.imageSrc}/>
+                        <br/>  
+                        <p style={{marginTop: "20px"}}>{photo.lugarOrgano}</p>
+                    </Card>
+                    ))}
+              </Col>
+            </Row>
+        </Container>
         </React.Fragment>
-        : <h1>Rellene el fomulario y seleccione fuente capturadora</h1>
+        : <React.Fragment>
+        <h3>Rellene el fomulario y seleccione fuente capturadora</h3>
+          <Form onSubmit={onSubmit}>
+            <Select name="Doctor_encargado" options={doctorArray} />
+            <Select name="Procedimiento" options={procedimientoArray} />
+            <Select name="Sedantes" options={sedanteArray} />
+            <Select name="Device" options={myArray} />
+            <Button type="submit" value="Submit" >Comenzar estudio</Button>
+          </Form>
+        </React.Fragment>
       }
 
 
 
-      <table class="bp3-html-table bp3-html-table-bordered bp3-html-table-condensed bp3-html-table-striped bp3-interactive bp3-small">
-      <thead>
-        <tr>
-          <th>id</th>
-          <th>Lugar</th>
-          <th>Fotografia</th>
-          <th>Acciones</th>   
-        </tr>
-      </thead>
-      <tbody>
-        {photos.slice(0).reverse().map((photo) => (
-          <tr key={photo.ids}>
-            <td>{photo.ids}</td>
-            <td>{photo.lugarOrgano}</td>
-            <td> <img style={{width: "150px"}} src={photo.imageSrc}/></td>
-            <td>Borrar</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+      
     </React.Fragment>
   )
 }
@@ -771,30 +777,50 @@ const guardar = () => {
 
   return(
     <React.Fragment>
-    <h1>Esquema</h1>
-    <h1>{sesion}</h1>
-    <div class="flexy">
-    <div class="flex-container">
-    {photos.slice(0).map((photo, index) => (
-      <Card interactive={true} elevation={Elevation.TWO} key={photo.ids} style={{width: "250px", margin: "20px"}}>
-        <p style={{width: "250px", margin: "-20px", marginBottom: "20px"}}><button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>{photo.ids}</p>
-        <img style={{width: "250px", margin: "-20px"}} src={photo.imageSrc}/>
-        <input style={{width: "250px", margin: "-20px", marginTop: "20px"}} type="text" name="name" value={photo.lugarOrgano} onChange={updateFieldChanged(index)}  />
-        
-      </Card>
-    ))}
-    </div>
-    <div class="c"  >
-    <HomePage dataImage={image => setEsquema(image)}/>
-    </div>
-    <button onClick={guardar} class="bp3-button bp3-minimal bp3-icon-camera"/>
-    </div>
+    <h1>Esquema {sesion}</h1>
 
-    <CKEditor
+    <Button onClick={guardar} icon="floppy-disk" large text="Guardar" intent="primary"/>
+
+    <Container fluid>
+    <Row>     
+      <Col >
+      <CKEditor
       editor={ClassicEditor}
       onChange={handleOnChage}
-    />
+      />
+      </Col>
+    </Row>
+  </Container>
 
+  <Container fluid>
+  <Row>
+    <Col sm={8}>
+        <Container fluid>
+        <Row>
+            {photos.slice(0).map((photo, index) => (
+              <Col xs={{ order: photo.id }}>
+              <Card interactive={true} elevation={Elevation.TWO} key={photo.ids} style={{width: "250px", margin: "5px"}}>
+                <p style={{width: "250px", margin: "-20px", marginBottom: "20px"}}><button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>{photo.ids}</p>
+                <img style={{width: "250px", margin: "-20px"}} src={photo.imageSrc}/>
+                <input style={{width: "250px", margin: "-20px", marginTop: "20px"}} type="text" name="name" value={photo.lugarOrgano} onChange={updateFieldChanged(index)}  />
+                
+              </Card>
+              </Col>
+            ))}
+        </Row>
+      </Container>
+    </Col>
+    <Col sm={4}>
+        <Container fluid>
+        <Row>     
+          <Col >
+          <HomePage dataImage={image => setEsquema(image)}/>
+          </Col>
+        </Row>
+      </Container>
+    </Col>
+  </Row>
+</Container>
     </React.Fragment>
     )    
 }
