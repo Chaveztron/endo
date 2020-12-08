@@ -195,6 +195,32 @@ app.on('ready', () => {
         event.returnValue = 'borrado de la base de datos'
     })
     
+    ipcMain.on('get-sesion', (event, arg) => {
+        const knex = require('knex')(options);
+        var sesion;
+        knex.from('sesiones').select("*")
+        .where({ id: arg.sesion_id })
+        .then((rows) => {
+            for (row of rows) {
+                var sesionF = {
+                    id: row.id,
+                    paciente: row.paciente, 
+                    fecha: row.fecha,
+                    esquema: row.esquema,
+                    hallazgo: row.hallazgo,
+                    doctor: row.doctor,
+                    procedimiento: row.procedimiento,
+                    sedante: row.sedante
+                };
+                sesion = sesionF;
+            }
+            event.returnValue = sesion
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+    })
+    
     ipcMain.on('get-todas_sesiones', (event, arg) => {
         const knex = require('knex')(options);
         var sesiones=[];

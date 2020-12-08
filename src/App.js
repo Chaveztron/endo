@@ -252,7 +252,7 @@ const Pacientes = (props) => {
         </tr>
       </thead>
       <tbody>
-        {filteredPacientes.map((user, index) =>(
+        {filteredPacientes.slice(0).reverse().map((user, index) =>(
           <tr key={user.id}>
             <td>{ user.id }</td>
             <td>{ user.nombre }</td>
@@ -322,7 +322,7 @@ const toggle = () => {
         </tr>
       </thead>
       <tbody>
-        {estudios.map((estudio,index) =>(
+        {estudios.slice(0).reverse().map((estudio,index) =>(
           <tr key={estudio.id}>
             <td>{ estudio.id }</td>
             <td>
@@ -396,7 +396,7 @@ const toggle = () => {
         </tr>
       </thead>
       <tbody>
-        {sesiones.map((estudio, index) =>(
+        {sesiones.slice(0).reverse().map((estudio, index) =>(
           <tr key={estudio.id}>
             <td>{ estudio.id }</td>
             <td>
@@ -464,7 +464,7 @@ const Reportes = (props) => {
 
   return(
     <React.Fragment>
-    <button onClick={handlePrint}>Print this out!</button>
+    <Button icon="add" icon="print" onClick={handlePrint}>Imprimir Reporte!!</Button>
     <Container ref={componentRef}>
     <Row>
       <Col
@@ -678,7 +678,8 @@ const Videos = ({location}, props) => {
                     to={{pathname:'/esquema',
                         esquemaProps:{
                           photos: photos,
-                          sesion: sesion
+                          sesion: sesion,
+                          paciente: id
                         }}}>
                     <Button icon="flow-end" intent="success" large text="Continuar con el estudio"/>
                     </NavLink>
@@ -724,18 +725,17 @@ const Videos = ({location}, props) => {
 const Esquema = (props) => {
   const [photos, setPhotos] = React.useState(props.location.esquemaProps.photos)
   const [sesion, setSesion] = React.useState(props.location.esquemaProps.sesion)
+  const [toggleState, setToggleState] = useState(false)
   const [esquema, setEsquema] = React.useState("")
   const [hallazgo, setHallazgo] = React.useState("")
+  
+  var pacienteiD = props.location.esquemaProps.paciente
 
-  useEffect(()=>{
-    console.log("dentro de Esquema")
-    return(
-      console.log("Saliendo del Esquema")
-    )
+  var sesionReporte = ipcRenderer.sendSync('get-sesion', {
+    sesion_id: sesion,
   })
 
-
-  const deleteItem = (i) => {
+const deleteItem = (i) => {
     const newPhotos = [...photos]
     newPhotos.splice(i, 1)
     setPhotos(newPhotos)
@@ -772,14 +772,31 @@ const guardar = () => {
       descripcion:  photo.lugarOrgano
     })) 
   ))
-
+  setToggleState(toggleState === false ? true : false)
 }
 
   return(
     <React.Fragment>
     <h1>Esquema {sesion}</h1>
 
-    <Button onClick={guardar} icon="floppy-disk" large text="Guardar" intent="primary"/>
+    {toggleState?
+      <NavLink
+      to={{pathname:'/reportes',
+      reporteProps:{
+      fechaEstudio: sesionReporte.fecha,
+      paciente: pacienteiD,
+      estudios_id: sesionReporte.id,
+      esquema: esquema,
+      hallazgo: hallazgo,
+      doctor: sesionReporte.doctor,
+      procedimiento: sesionReporte.procedimiento,
+      sedante: sesionReporte.sedante
+      }}}
+      >
+      <Button icon="print" large text="Generar Reporte" intent="success"/>
+      </NavLink>
+      : 
+      <Button onClick={guardar} icon="floppy-disk" large text="Guardar" intent="primary"/>}
 
     <Container fluid>
     <Row>     
