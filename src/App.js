@@ -44,7 +44,6 @@ const App = () => {
 
 const Add_paciente = (props) => {
   const onSubmit = data => {
-    console.log(data)
     console.log(ipcRenderer.sendSync('add-paciente', {
       nombre: data.Nombre,
       apellido_paterno: data.Apellido_paterno,
@@ -199,11 +198,9 @@ const Pacientes = (props) => {
   },[search, users])
 
   const deletePaciente = (i, id) => {
-      console.log(filteredPacientes[i].id)
-
       const newPacientes = [...filteredPacientes]
       newPacientes.splice(i, 1)
-      setUser(newPacientes)
+      setFilteredPacientes(newPacientes)
 
       let sesiones = (ipcRenderer.sendSync('get-sesiones', {
         user_id: id,
@@ -216,9 +213,6 @@ const Pacientes = (props) => {
       console.log(ipcRenderer.sendSync('del-paciente', {
         id: id,
       }))
-
-      console.log(i)
-
  
   }
 
@@ -305,8 +299,6 @@ const toggle = () => {
   setToggleState(toggleState === false ? true : false)
 }
 
-
-  console.log(estudios)
   return(
     <React.Fragment>
     <h1>Estudios</h1>
@@ -385,7 +377,6 @@ const toggle = () => {
   setToggleState(toggleState === false ? true : false)
 }
 
-  console.log(sesiones)
   return(
     <React.Fragment>
     <h1>Sesiones</h1>
@@ -624,15 +615,11 @@ const Videos = ({location}, props) => {
       ids = ids + 1
       const imageSrc = webcamRef.current.getScreenshot();
       const lugarOrgano = areaOrgano.current.value
-      areaOrgano.current.value = ""
-      console.log(lugarOrgano)
-      console.log(imageSrc)
-      
+      areaOrgano.current.value = ""      
       setPhotos(photos => [...photos,{ids, imageSrc, lugarOrgano}])
     },
     [webcamRef]
   )
-  console.log(location)
   const { id } = queryString.parse(location.search)
 
   const deleteItem = (i) => {
@@ -644,8 +631,6 @@ const Videos = ({location}, props) => {
   const onSubmit = data => {
     setDeviceId(data.Device)
     let now = new Date().getTime();
-    console.log(now)
-    console.log(Date(now))
 
     setSesion(ipcRenderer.sendSync('add-sesion', {
       paciente: id,
@@ -682,8 +667,7 @@ const Videos = ({location}, props) => {
 
   return (
     <React.Fragment>
-      <h1>Endoscopía</h1>
-      <h2>ID: { id }</h2>
+      <h1>Endoscopía al paciente { (ipcRenderer.sendSync('get-paciente', {paciente_id:  id})).nombre }</h1>
 
       {deviceId
         ?  <React.Fragment>
@@ -759,8 +743,6 @@ const deleteItem = (i) => {
 }
 
 const updateFieldChanged = index => e => {
-  console.log('index: ' + index);
-  console.log('property name: '+ e.target.name);
   let newArr = [...photos]; // copying the old datas array
   newArr[index].lugarOrgano = e.target.value; // replace e.target.value with whatever you want to change it to
   setPhotos(newArr); // ??
