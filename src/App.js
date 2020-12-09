@@ -318,6 +318,8 @@ const toggle = () => {
         <tr>
           <th>id</th>
           <th>Fecha</th>
+          <th>Doctor</th>
+          <th>Procedimiento</th>
           <th>acciones</th>
         </tr>
       </thead>
@@ -335,6 +337,8 @@ const toggle = () => {
               second: 'numeric'
             }).format(estudio.fecha)}
             </td>
+            <td>{ (ipcRenderer.sendSync('get-doctor', {doctor_id: estudio.doctor})).doctor  }</td>
+            <td>{ (ipcRenderer.sendSync('get-procedimiento', {procedimiento_id: estudio.procedimiento})).procedimiento }</td>
             <td>
             <NavLink
             to={{pathname:'/reportes',
@@ -368,6 +372,7 @@ const toggle = () => {
 const Sesiones = (props) => {
   const [sesiones, setSesiones] = useState(ipcRenderer.sendSync('get-todas_sesiones'))
   const [toggleState, setToggleState] = useState(false)
+  
 
   const deleteSesion = (i) => {
     console.log(ipcRenderer.sendSync('del-sesion', {
@@ -392,6 +397,9 @@ const toggle = () => {
         <tr>
           <th>id</th>
           <th>Fecha</th>
+          <th>Doctor</th>
+          <th>Paciente</th>
+          <th>Procedimiento</th>
           <th>acciones</th>
         </tr>
       </thead>
@@ -409,6 +417,17 @@ const toggle = () => {
               second: 'numeric'
             }).format(estudio.fecha)}
             </td>
+            <td>{ (ipcRenderer.sendSync('get-doctor', {doctor_id: estudio.doctor})).doctor  }</td>
+
+            <td>{
+              (ipcRenderer.sendSync('get-paciente', {paciente_id:  estudio.paciente})).nombre+" "+
+              (ipcRenderer.sendSync('get-paciente', {paciente_id:  estudio.paciente})).apellido_paterno+" "+
+              (ipcRenderer.sendSync('get-paciente', {paciente_id:  estudio.paciente})).apellido_materno
+            }</td>
+
+
+            <td>{ (ipcRenderer.sendSync('get-procedimiento', {procedimiento_id: estudio.procedimiento})).procedimiento }</td>
+            
             <td>
             <NavLink
             to={{pathname:'/reportes',
