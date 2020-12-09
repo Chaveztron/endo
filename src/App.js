@@ -19,10 +19,8 @@ const App = () => {
     <BrowserRouter>
       <nav class="bp3-navbar .modifier">
         <div class="bp3-navbar-group bp3-align-left">
-        <Route render={NavegacionImperativa} />
         <span class="bp3-navbar-divider"></span>
           <div class="bp3-navbar-heading">EndoClinic</div>
-          <input class="bp3-input" placeholder="Search files..." type="text" />
         </div>
         <div class="bp3-navbar-group bp3-align-right">
         <NavLink to='/' exact activeClassName='active'><button class="bp3-button bp3-minimal bp3-intent-success bp3-icon-add">Agregar paciente</button></NavLink>
@@ -30,9 +28,6 @@ const App = () => {
         <NavLink to='/sesiones' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-document">Sesiones</button></NavLink>
         <NavLink to='/configuracion' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-cog">Configuracion</button></NavLink>
           <span class="bp3-navbar-divider"></span>
-          <button class="bp3-button bp3-minimal bp3-icon-user"></button>
-          <button class="bp3-button bp3-minimal bp3-icon-notifications"></button>
-          <button class="bp3-button bp3-minimal bp3-icon-cog"></button>
         </div>
       </nav>
       <Route path='/' exact render={Add_paciente}/>
@@ -56,8 +51,7 @@ const Add_paciente = (props) => {
       apellido_materno: data.Apellido_materno,
       genero: data.Genero,
       nacimiento: data.Nacimiento,
-      telefono: data.Telefono,
-      sexo: data.Sexo
+      telefono: data.Telefono
     }))
 
   };
@@ -70,7 +64,6 @@ const Add_paciente = (props) => {
         <Input name="Apellido_materno" />
         <NumInput name="Telefono"/>
         <Radios name="Genero" values={["Hombre", "Mujer"]}/>
-        <Select name="Sexo" options={["mujer", "hombre"]} />
         <DatePiker name="Nacimiento"/>
         <Button type="submit" value="Submit" >Agregar </Button>
       </Form> 
@@ -205,9 +198,15 @@ const Pacientes = (props) => {
     )
   },[search, users])
 
-  const deletePaciente = (i) => {
+  const deletePaciente = (i, id) => {
+      console.log(filteredPacientes[i].id)
+
+      const newPacientes = [...filteredPacientes]
+      newPacientes.splice(i, 1)
+      setUser(newPacientes)
+
       let sesiones = (ipcRenderer.sendSync('get-sesiones', {
-        user_id: users[i].id,
+        user_id: id,
       }))
       sesiones.map((sesion) => (
         console.log(ipcRenderer.sendSync('del-sesion', {
@@ -215,11 +214,12 @@ const Pacientes = (props) => {
         }))
       ))
       console.log(ipcRenderer.sendSync('del-paciente', {
-        id: users[i].id,
+        id: id,
       }))
-      const newPacientes = [...users]
-      newPacientes.splice(i, 1)
-      setUser(newPacientes)
+
+      console.log(i)
+
+ 
   }
 
   const toggle = () => {
@@ -245,21 +245,19 @@ const Pacientes = (props) => {
           <th>A.Paterno</th>
           <th>A.Materno</th>
           <th>Telefono</th>
-          <th>Sexo</th>
           <th>Genero</th>
           <th>Nacimiento</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        {filteredPacientes.slice(0).reverse().map((user, index) =>(
+        {filteredPacientes.reverse().map((user, index) =>(
           <tr key={user.id}>
             <td>{ user.id }</td>
             <td>{ user.nombre }</td>
             <td>{ user.apellido_paterno }</td>
             <td>{ user.apellido_materno }</td>
             <td>{ user.telefono }</td>
-            <td>{ user.sexo }</td>
             <td>{ user.genero }</td>            
             <td>{ user.nacimiento }</td>
             <td>
@@ -276,7 +274,7 @@ const Pacientes = (props) => {
             </NavLink>
             {toggleState?
               <React.Fragment>
-              <button onClick={() => deletePaciente(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
+              <button onClick={() => deletePaciente(index, user.id)} class="bp3-button bp3-minimal bp3-icon-trash"/>
               </React.Fragment>
             :<button class="bp3-button bp3-minimal bp3-icon-trash" disabled/>}
             </td>
@@ -861,14 +859,6 @@ const guardar = () => {
     )    
 }
 
-const NavegacionImperativa = ({ history }) => {
-  console.log(history)
-  return (
-    <div>
-      <button class="bp3-button bp3-minimal bp3-icon-undo" onClick={history.goBack}/>
-      <button class="bp3-button bp3-minimal bp3-icon-flow-end" onClick={history.goForward}/>
-    </div>
-  )
-}
+
 
 export default App

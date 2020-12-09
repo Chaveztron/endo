@@ -49,8 +49,7 @@ app.on('ready', () => {
             apellido_materno: arg.apellido_materno,
             genero: arg.genero,
             nacimiento: arg.nacimiento,
-            telefono: arg.telefono,
-            sexo: arg.sexo
+            telefono: arg.telefono
         })
         .catch((err) => { console.log(err); throw err })
         .finally(() => {
@@ -130,8 +129,7 @@ app.on('ready', () => {
                     apellido_materno: row.apellido_materno,
                     genero: row.genero,
                     nacimiento: row.nacimiento,
-                    telefono: row.telefono,
-                    sexo: row.sexo
+                    telefono: row.telefono
                 };
                 pacientes.push(paciente);
             }
@@ -282,8 +280,7 @@ app.on('ready', () => {
                     apellido_materno: row.apellido_materno,
                     genero: row.genero,
                     nacimiento: row.nacimiento,
-                    telefono: row.telefono,
-                    sexo: row.sexo
+                    telefono: row.telefono
                 };
                 paciente = paciente_row;
             }
