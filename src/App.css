@@ -68,3 +68,48 @@ body {
   margin-left: -20px;
   flex: 1
 }
+
+
+
+
+
+.logo, .titulo
+{
+  padding: 5px;
+}
+.tablaI
+{
+  float: left; 
+  margin-top: 50px; 
+  margin-left: 50px;
+  font-size: larger;
+}
+.logo
+{
+  background-color: #499ae9;
+  width: 29%;
+  height: 58px;
+  margin-right: 10px;
+  float: left;
+}
+
+.titulo
+{
+  background-color: #d4e4ef;
+  text-align: center;
+  width: 60%;
+  height: 58px;
+  float: left;
+}
+.esquema
+{
+  float: left;
+  margin-bottom: 25px;
+  margin-left: 60px;
+}
+.foto
+{
+  margin: 1em;
+  text-align: center;
+  float: left;
+}

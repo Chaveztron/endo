@@ -474,113 +474,86 @@ const Reportes = (props) => {
     <React.Fragment>
     <Button icon="add" icon="print" onClick={handlePrint}>Imprimir Reporte!!</Button>
     <Container ref={componentRef}>
-    <Row>
-      <Col
-        auto
-        xs={3}
-        style={{ backgroundColor: "rgba(73,155,234,1)", margin: "10px" }}
-      >
-        <img
-          src="http://endoclinik.com.mx/wp-content/uploads/2019/05/logobalnco.png"
-          style={{ width: "230px" }}
-        />
-      </Col>
-      <Col
-        auto
-        style={{ background: "rgba(212,228,239,1)", margin: "10px" }}
-      >
-        <div
-          style={{
-            margin: "10px",
-            marginLeft: "20%",
-            alignContent: "center"
-          }}
-        >
-          INFORME DEL ESTUDIO ENDOCLINIC
-          <h6>SERVICIO DE ENDOSCOPIA</h6>
-        </div>
-      </Col>
-    </Row>
-    <Row>
-      <Col style={{ marginRight: "-110px" }}>
-        <b>Paciente:</b>
-        <br />
-        <b>Edad:</b>
-        <br />
+  <div className="logo">
+    <img src="http://endoclinik.com.mx/wp-content/uploads/2019/05/logobalnco.png" style={{width: "220px"}} />
+  </div>
 
-        <b>Referido por:</b>
-        <br />
-        <b>Procedimiento:</b>
-        <br />
-        <b>Fecha del estudio:</b>
-        <br />
-        <b>Sedacion:</b>
-        <br />
-      </Col>
-      <Col auto>
+  <div className="titulo">
+    INFORME DEL ESTUDIO ENDOCLINIC<br/>
+    <b>SERVICIO DE ENDOSCOPIA</b>
+  </div>
+
+  <table className="tablaI">
+    <tr>
+      <td><b>Paciente:</b></td>
+      <td>
       { (paciente.apellido_paterno+" "
       +paciente.apellido_materno+" "
       +paciente.nombre).toUpperCase() }
-        <br />
-        {parseInt(new Intl.DateTimeFormat("default", {
-          year: "numeric"
-        }).format(now)) - parseInt(anoNacimiento)} AÑOS
-        
-        <br />
-        {(doctor.doctor).toUpperCase()}
-        <br />
-        {procedimiento.procedimiento}
-        <br />
-        {new Intl.DateTimeFormat("default", {
-          day: "2-digit"
-        }).format(props.location.reporteProps.fechaEstudio)}/
-        {new Intl.DateTimeFormat("default", {
-          month: "long"
-        }).format(props.location.reporteProps.fechaEstudio)}/
-        {new Intl.DateTimeFormat("default", {
-          year: "numeric"
-        }).format(props.location.reporteProps.fechaEstudio)} {new Intl.DateTimeFormat("default", {
-          hour: 'numeric',
-          minute: 'numeric',
-          second: 'numeric'
-        }).format(props.location.reporteProps.fechaEstudio)}
-        <br />
-        {sedante.sedante}
-        <br />
-      </Col>
-      <Col>
-        <img
-          src={esquema}
-          style={{ width: "300px" }}
-        />
-      </Col>
-    </Row>
+      </td>
+    </tr>
+    <tr>
+      <td><b>Edad:</b></td>
+      <td>
+      {parseInt(new Intl.DateTimeFormat("default", {
+        year: "numeric"
+      }).format(now)) - parseInt(anoNacimiento)} AÑOS
+      </td>
+    </tr>
+    <tr>
+      <td><b>Referido por:</b></td>
+      <td>{(doctor.doctor).toUpperCase()}</td>
+    </tr>
+    <tr>
+      <td><b>Procedimiento:</b></td>
+      <td>{procedimiento.procedimiento}</td>
+    </tr>
+    <tr>
+      <td><b>Fecha del estudio:</b></td>
+      <td>
+      {new Intl.DateTimeFormat("default", {
+        day: "2-digit"
+      }).format(props.location.reporteProps.fechaEstudio)}/
+      {new Intl.DateTimeFormat("default", {
+        month: "long"
+      }).format(props.location.reporteProps.fechaEstudio)}/
+      {new Intl.DateTimeFormat("default", {
+        year: "numeric"
+      }).format(props.location.reporteProps.fechaEstudio)} {new Intl.DateTimeFormat("default", {
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+      }).format(props.location.reporteProps.fechaEstudio)}
+      </td>
+    </tr>
+    <tr>
+      <td><b>Sedacion:</b></td>
+      <td>{sedante.sedante}</td>
+    </tr>
+  </table>
 
-    <Row>
-    {capturas.slice(0).map((photo, index) => (
-      <Col xs={{ order: photo.id }}>
-        <Card2 style={{ width: "15rem" }}>
-          <Card2.Img
-            variant="top"
-            src={photo.captura}
-            style={{ width: "230px" }}
-          />
-          <Card2.Footer>
-            <h6>{photo.identificador}-{photo.descripcion}</h6>
-          </Card2.Footer>
-        </Card2>
-      </Col>
-    ))}
-      </Row>
+   <div className="esquema">
+   <img
+      src={esquema}
+      style={{ width: "400px" }}
+   />
+     </div>
 
-    <Row>
-      <Col>
+ <div className="fotografias" style={{float:"left"}}>
+  {capturas.slice(0).map((photo, index) => (
+    <div className="foto" key={{ index }}>
+    <img src={photo.captura} style={{ width: "230px", height: "230px" }} />
+    <h4 style={{marginTop: "2px"}}>{photo.identificador}-{photo.descripcion}</h4>
+  </div>
+  ))}
+
+ </div>
+<div style={{float:"left"}}>
         <h2>Hallazgos</h2>
         <p>
           {ReactHtmlParser(hallazgo)}
         </p>
-      </Col>
-    </Row>
+  </div>
   </Container>
 
 
