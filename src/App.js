@@ -393,7 +393,7 @@ const toggle = () => {
         </tr>
       </thead>
       <tbody>
-        {sesiones.slice(0).reverse().map((estudio, index) =>(
+        {sesiones.reverse().map((estudio, index) =>(
           <tr key={estudio.id}>
             <td>{ estudio.id }</td>
             <td>
@@ -665,7 +665,7 @@ const Videos = ({location}, props) => {
               
               </Col>
               <Col sm={4}>
-                    {photos.slice(0).reverse().map((photo, index) => (
+                    {photos.reverse().map((photo, index) => (
                       <Card elevation={Elevation.TWO} key={photo.ids} style={{width: "250px", margin: "20px"}}>
                         <p style={{width: "250px", margin: "-20px", marginBottom: "20px"}}><button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>{photo.ids}</p>
                         <img style={{width: "250px", margin: "-20px"}} src={photo.imageSrc}/>
