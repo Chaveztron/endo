@@ -181,7 +181,7 @@ const Configuracion = (props) => {
 }
 
 const Pacientes = (props) => {
-  const [users, setUser] = useState(ipcRenderer.sendSync('get-pacientes'))
+  const [users, setUser] = useState(ipcRenderer.sendSync('get-pacientes').reverse())
   const [toggleState, setToggleState] = useState(false)
 
   const [search, setSearch] = useState('');
@@ -245,7 +245,7 @@ const Pacientes = (props) => {
         </tr>
       </thead>
       <tbody>
-        {filteredPacientes.reverse().map((user, index) =>(
+        {filteredPacientes.map((user, index) =>(
           <tr key={user.id}>
             <td>{ user.id }</td>
             <td>{ user.nombre }</td>
@@ -360,7 +360,7 @@ const toggle = () => {
 }
 
 const Sesiones = (props) => {
-  const [sesiones, setSesiones] = useState(ipcRenderer.sendSync('get-todas_sesiones'))
+  const [sesiones, setSesiones] = useState(ipcRenderer.sendSync('get-todas_sesiones').reverse())
   const [toggleState, setToggleState] = useState(false)
   
 
@@ -393,7 +393,7 @@ const toggle = () => {
         </tr>
       </thead>
       <tbody>
-        {sesiones.reverse().map((estudio, index) =>(
+        {sesiones.map((estudio, index) =>(
           <tr key={estudio.id}>
             <td>{ estudio.id }</td>
             <td>
@@ -474,16 +474,16 @@ const Reportes = (props) => {
     <React.Fragment>
     <Button icon="add" icon="print" onClick={handlePrint}>Imprimir Reporte!!</Button>
     <Container ref={componentRef}>
-  <div className="logo">
+    <div className="logo" style={{backgroundColor: "#499ae9", padding: "5px", width: "29%", height: "58px", marginRight: "10px", float: "left" }}>
     <img src="http://endoclinik.com.mx/wp-content/uploads/2019/05/logobalnco.png" style={{width: "220px"}} />
   </div>
 
-  <div className="titulo">
+  <div className="titulo" style={{backgroundColor: "#d4e4ef", padding: "5px", textAlign: "center", width: "60%", height: "58px", float: "left"}}>
     INFORME DEL ESTUDIO ENDOCLINIC<br/>
     <b>SERVICIO DE ENDOSCOPIA</b>
   </div>
 
-  <table className="tablaI">
+  <table className="tablaI" style={{float: "left", marginTop: "50px", fontSize: "medium", float:"left"}}>
     <tr>
       <td><b>Paciente:</b></td>
       <td>
@@ -532,17 +532,17 @@ const Reportes = (props) => {
     </tr>
   </table>
 
-   <div className="esquema">
+   <div className="esquema" style={{float: "left"}}>
    <img
       src={esquema}
-      style={{ width: "400px" }}
+      style={{ width: "300px", float: "left" }}
    />
      </div>
 
  <div className="fotografias" style={{float:"left"}}>
   {capturas.slice(0).map((photo, index) => (
-    <div className="foto" key={{ index }}>
-    <img src={photo.captura} style={{ width: "230px", height: "230px" }} />
+    <div className="foto" key={{ index }} style={{margin: "10px", textAlign: "center", float: "left"}}>
+    <img src={photo.captura} style={{ width: "225px" }} />
     <h4 style={{marginTop: "2px"}}>{photo.identificador}-{photo.descripcion}</h4>
   </div>
   ))}
@@ -554,7 +554,7 @@ const Reportes = (props) => {
           {ReactHtmlParser(hallazgo)}
         </p>
   </div>
-  </Container>
+    </Container>
 
 
     </React.Fragment>
@@ -665,7 +665,7 @@ const Videos = ({location}, props) => {
               
               </Col>
               <Col sm={4}>
-                    {photos.reverse().map((photo, index) => (
+                {photos.reverse().map((photo, index) => (
                       <Card elevation={Elevation.TWO} key={photo.ids} style={{width: "250px", margin: "20px"}}>
                         <p style={{width: "250px", margin: "-20px", marginBottom: "20px"}}><button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>{photo.ids}</p>
                         <img style={{width: "250px", margin: "-20px"}} src={photo.imageSrc}/>
