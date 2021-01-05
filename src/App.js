@@ -7,7 +7,7 @@ import Webcam from "react-webcam";
 import { Form, Input, Select, NumInput, Radios, DatePiker } from "./components";
 import HomePage from "./esquemaJs/HomePage";
 import { useReactToPrint } from 'react-to-print';
-import { Container, Row, Col, Card as Card2, Form as BForm } from "react-bootstrap";
+import { Container, Row, Col, Card as Card2, Form as BForm, Modal } from "react-bootstrap";
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import ReactHtmlParser from 'react-html-parser';
@@ -665,7 +665,7 @@ const Videos = ({location}, props) => {
               
               </Col>
               <Col sm={4}>
-                {photos.reverse().map((photo, index) => (
+                {photos.slice(0).reverse().map((photo, index) => (
                       <Card elevation={Elevation.TWO} key={photo.ids} style={{width: "250px", margin: "20px"}}>
                         <p style={{width: "250px", margin: "-20px", marginBottom: "20px"}}><button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>{photo.ids}</p>
                         <img style={{width: "250px", margin: "-20px"}} src={photo.imageSrc}/>
@@ -697,11 +697,27 @@ const Videos = ({location}, props) => {
 }
 
 const Esquema = (props) => {
-  const [photos, setPhotos] = React.useState(props.location.esquemaProps.photos)
+  const [photos, setPhotos] = React.useState((props.location.esquemaProps.photos))
   const [sesion, setSesion] = React.useState(props.location.esquemaProps.sesion)
   const [toggleState, setToggleState] = useState(false)
   const [esquema, setEsquema] = React.useState("")
   const [hallazgo, setHallazgo] = React.useState("")
+
+  const [imageCode, setImageCode] = React.useState()
+  const [imageCodeIndex, setImageCodeIndex] = React.useState()
+
+  const [photoEdit, setphotoEdit] = React.useState("")
+
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  //const handleShow = () => setShow(true);
+
+
+  const handleShow = (i) => {
+    setImageCode(photos[i].imageSrc)
+    setImageCodeIndex(i)
+    setShow(true)
+  }
   
   var pacienteiD = props.location.esquemaProps.paciente
 
@@ -713,6 +729,13 @@ const deleteItem = (i) => {
     const newPhotos = [...photos]
     newPhotos.splice(i, 1)
     setPhotos(newPhotos)
+}
+
+const editPhoto = (i) => {
+  const Photos = [...photos]
+  Photos[i].imageSrc = photoEdit
+  setPhotos(Photos)
+  setShow(false)
 }
 
 const updateFieldChanged = index => e => {
@@ -789,7 +812,10 @@ const guardar = () => {
             {photos.slice(0).map((photo, index) => (
               <Col xs={{ order: photo.id }}>
               <Card interactive={true} elevation={Elevation.TWO} key={photo.ids} style={{width: "250px", margin: "5px"}}>
-                <p style={{width: "250px", margin: "-20px", marginBottom: "20px"}}><button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>{photo.ids}</p>
+                  <p style={{width: "250px", margin: "-20px", marginBottom: "20px"}}><button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
+                  <button onClick={() => handleShow(index)} class="bp3-button bp3-minimal bp3-icon-edit"/>
+                  {photo.ids}
+                  </p>
                 <img style={{width: "250px", margin: "-20px"}} src={photo.imageSrc}/>
                 <input style={{width: "250px", margin: "-20px", marginTop: "20px"}} type="text" name="name" value={photo.lugarOrgano} onChange={updateFieldChanged(index)}  />
                 
@@ -803,14 +829,35 @@ const guardar = () => {
         <Container fluid>
         <Row>     
           <Col >
-          <HomePage dataImage={image => setEsquema(image)}/>
+          <HomePage dataImage={image => setEsquema(image)} photo={null}/>
           </Col>
         </Row>
       </Container>
     </Col>
   </Row>
 </Container>
-    </React.Fragment>
+
+    <Modal
+        show={show}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Edición de fotografía</Modal.Title>
+          </Modal.Header>
+            <Modal.Body>
+            <HomePage dataImage={image => setphotoEdit(image)} photo={imageCode}/>
+            
+            </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Cancelar
+            </Button>
+            <Button variant="primary" onClick={() => editPhoto(imageCodeIndex)}>Aplicar Cambios</Button>
+          </Modal.Footer>
+    </Modal>
+  </React.Fragment>
     )    
 }
 

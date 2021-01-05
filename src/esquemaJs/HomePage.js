@@ -7,10 +7,12 @@ import Circle from "./Circle";
 import { addTextNode } from "./textNode";
 import Image from "./Image";
 const uuidv1 = require("uuid/dist/v1");
-function HomePage({ dataImage }) {
+const photoId = uuidv1;
+
+function HomePage({ dataImage, photo}) {
   const [num, setNum] = useState(1)
   const [circles, setCircles] = useState([]);
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState([{content: photo, photoId,}]);
   const [selectedId, selectShape] = useState(null);
   const [shapes, setShapes] = useState([]);
   const [, updateState] = React.useState();
@@ -33,7 +35,8 @@ function HomePage({ dataImage }) {
       y: getRandomInt(100),
       width: 100,
       height: 100,
-      fill: "red",
+      stroke: "red",
+      strokeWidth: 10,
       id: `circ${circles.length + 1}`,
     };
     const circs = circles.concat([circ]);
@@ -113,13 +116,13 @@ function HomePage({ dataImage }) {
     <div className="home-page" style={{width: 500, height: 500}}>
       <ButtonGroup>
         <Button variant="secondary" onClick={addCircle}>
-          Circle
+          Circulo
         </Button>
         <Button variant="secondary" onClick={drawText}>
-          Text
+          Numero
         </Button>
         <Button variant="secondary" onClick={drawImage}>
-          Image
+          Imagen
         </Button>
         <Button variant="secondary" onClick={undo}>
           Undo
@@ -152,6 +155,24 @@ function HomePage({ dataImage }) {
         }}
       >
         <Layer ref={layerEl}>
+
+          {images.map((image, i) => {
+            return (
+              <Image
+                key={i}
+                imageUrl={image.content}
+                isSelected={image.id === selectedId}
+                onSelect={() => {
+                  selectShape(image.id);
+                }}
+                onChange={newAttrs => {
+                  const imgs = images.slice();
+                  imgs[i] = newAttrs;
+                }}
+              />
+            );
+          })}
+
           {circles.map((circle, i) => {
             return (
               <Circle
@@ -165,22 +186,6 @@ function HomePage({ dataImage }) {
                   const circs = circles.slice();
                   circs[i] = newAttrs;
                   setCircles(circs);
-                }}
-              />
-            );
-          })}
-          {images.map((image, i) => {
-            return (
-              <Image
-                key={i}
-                imageUrl={image.content}
-                isSelected={image.id === selectedId}
-                onSelect={() => {
-                  selectShape(image.id);
-                }}
-                onChange={newAttrs => {
-                  const imgs = images.slice();
-                  imgs[i] = newAttrs;
                 }}
               />
             );

@@ -23,7 +23,7 @@
     "react-webcam": "^5.2.0",
     "simple-flexbox": "^2.3.1",
     "sqlite3": "^5.0.0",
-    "use-image": "^1.0.6",
+    "use-image": "^1.0.7",
     "uuid": "^8.3.0"
   },
   "main": "main.js",
