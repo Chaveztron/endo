@@ -20,7 +20,7 @@ const App = () => {
       <nav class="bp3-navbar .modifier">
         <div class="bp3-navbar-group bp3-align-left">
         <span class="bp3-navbar-divider"></span>
-          <div class="bp3-navbar-heading">EndoClinic</div>
+          <div class="bp3-navbar-heading">EndoClinik</div>
         </div>
         <div class="bp3-navbar-group bp3-align-right">
         <NavLink to='/' exact activeClassName='active'><button class="bp3-button bp3-minimal bp3-intent-success bp3-icon-add">Agregar paciente</button></NavLink>
@@ -43,13 +43,24 @@ const App = () => {
 }
 
 const Add_paciente = (props) => {
+  let now = new Date().getTime();
+
   const onSubmit = data => {
+    var fechaNacimiento;
+    if(data.Edad){
+      var fechaN = parseInt(new Intl.DateTimeFormat("default", {
+        year: "numeric"
+      }).format(now)) - parseInt(data.Edad)
+      fechaNacimiento = fechaN+"-01-01"
+    }else{
+      fechaNacimiento = data.Nacimiento
+    }
     console.log(ipcRenderer.sendSync('add-paciente', {
       nombre: data.Nombre,
       apellido_paterno: data.Apellido_paterno,
       apellido_materno: data.Apellido_materno,
       genero: data.Genero,
-      nacimiento: data.Nacimiento,
+      nacimiento: fechaNacimiento,
       telefono: data.Telefono
     }))
 
@@ -64,6 +75,7 @@ const Add_paciente = (props) => {
         <NumInput name="Telefono"/>
         <Radios name="Genero" values={["Hombre", "Mujer"]}/>
         <DatePiker name="Nacimiento"/>
+        <NumInput name="Edad"/>
         <Button type="submit" value="Submit" >Agregar </Button>
       </Form> 
     </React.Fragment>
@@ -78,24 +90,17 @@ const Configuracion = (props) => {
   const [sedantes, setSedantes] = useState(ipcRenderer.sendSync('get-sedantes'));
   const [sedante, setSedante] = useState("");
 
+  const [asistentes, setAsistentes] = useState(ipcRenderer.sendSync('get-asistentes'));
+  const [asistente, setAsistente] = useState("");
+
+  const [instrumentos, setInstrumentos] = useState(ipcRenderer.sendSync('get-instrumentos'));
+  const [instrumento, setInstrumento] = useState("");
+
   const handleSubmitDoctor = (evt) => {
     evt.preventDefault();
     var idTemp = ipcRenderer.sendSync('add-doctor', { doctor: doctor })
     setDoctores(doctores => [...doctores,{id: idTemp, doctor: doctor}])      
   }
-
-  const handleSubmitProcedimiento = (evt) => {
-    evt.preventDefault();
-    var idTemp = ipcRenderer.sendSync('add-procedimiento', { procedimiento: procedimiento })
-    setProcedimientos(procedimientos => [...procedimientos,{id: idTemp, procedimiento: procedimiento}])      
-  }
-
-  const handleSubmitSedante = (evt) => {
-    evt.preventDefault();
-    var idTemp = ipcRenderer.sendSync('add-sedante', { sedante: sedante })
-    setSedantes(sedantes => [...sedantes,{id: idTemp, sedante: sedante }])      
-  }
-
   const deleteDoctor = (i) => {
     console.log(ipcRenderer.sendSync('del-doctor', {
       id: doctores[i].id,
@@ -105,6 +110,11 @@ const Configuracion = (props) => {
     setDoctores(newDoctores)
   }
 
+  const handleSubmitProcedimiento = (evt) => {
+    evt.preventDefault();
+    var idTemp = ipcRenderer.sendSync('add-procedimiento', { procedimiento: procedimiento })
+    setProcedimientos(procedimientos => [...procedimientos,{id: idTemp, procedimiento: procedimiento}])      
+  }
   const deleteProcedimiento = (i) => {
     console.log(ipcRenderer.sendSync('del-procedimiento', {
       id: procedimientos[i].id,
@@ -114,6 +124,11 @@ const Configuracion = (props) => {
     setProcedimientos(newProcedimientos)
   }
 
+  const handleSubmitSedante = (evt) => {
+    evt.preventDefault();
+    var idTemp = ipcRenderer.sendSync('add-sedante', { sedante: sedante })
+    setSedantes(sedantes => [...sedantes,{id: idTemp, sedante: sedante }])      
+  }
   const deleteSedante = (i) => {
     console.log(ipcRenderer.sendSync('del-sedante', {
       id: sedantes[i].id,
@@ -122,6 +137,35 @@ const Configuracion = (props) => {
     newSedantes.splice(i, 1)
     setSedantes(newSedantes)
   }
+
+  const handleSubmitAsistente = (evt) => {
+    evt.preventDefault();
+    var idTemp = ipcRenderer.sendSync('add-asistente', { asistente: asistente })
+    setAsistentes(asistentes => [...asistentes,{id: idTemp, asistente: asistente }])      
+  }
+  const deleteAsistente = (i) => {
+    console.log(ipcRenderer.sendSync('del-asistente', {
+      id: asistentes[i].id,
+    }))
+    const newAsistentes = [...asistentes]
+    newAsistentes.splice(i, 1)
+    setAsistentes(newAsistentes)
+  }
+
+  const handleSubmitInstrumento = (evt) => {
+    evt.preventDefault();
+    var idTemp = ipcRenderer.sendSync('add-instrumento', { instrumento: instrumento })
+    setInstrumentos(instrumentos => [...instrumentos,{id: idTemp, instrumento: instrumento }])      
+  }
+  const deleteInstrumento = (i) => {
+    console.log(ipcRenderer.sendSync('del-instrumento', {
+      id: instrumentos[i].id,
+    }))
+    const newInstrumentos = [...instrumentos]
+    newInstrumentos.splice(i, 1)
+    setInstrumentos(newInstrumentos)
+  }
+
 
   return(
     <React.Fragment>
@@ -173,6 +217,38 @@ const Configuracion = (props) => {
         <button onClick={() => deleteSedante(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
         </li>
       ))}
+      </ul>
+
+      <form onSubmit={handleSubmitAsistente}>
+          <ControlGroup fill={false} vertical={false}>
+          <InputGroup placeholder="Asistente" type="text" value={asistente}
+            onChange={e => setAsistente(e.target.value)} 
+          />
+          <Button icon="add" type="submit" value="Submit">Agregar asistente</Button>
+          </ControlGroup>
+      </form>
+      <ul>
+      {asistentes.map((asistente, index) => (      
+        <li>{asistente.id} {asistente.asistente}
+        <button onClick={() => deleteAsistente(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
+        </li>
+      ))}
+      </ul>
+
+      <form onSubmit={handleSubmitInstrumento}>
+      <ControlGroup fill={false} vertical={false}>
+      <InputGroup placeholder="Instrumento" type="text" value={instrumento}
+        onChange={e => setInstrumento(e.target.value)} 
+      />
+      <Button icon="add" type="submit" value="Submit">Agregar instrumento</Button>
+      </ControlGroup>
+      </form>
+      <ul>
+        {instrumentos.map((instrumento, index) => (      
+          <li>{instrumento.id} {instrumento.instrumento}
+          <button onClick={() => deleteInstrumento(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
+          </li>
+        ))}
       </ul>
 
     
@@ -549,7 +625,6 @@ const Reportes = (props) => {
 
  </div>
 <div style={{float:"left"}}>
-        <h2>Hallazgos</h2>
         <p>
           {ReactHtmlParser(hallazgo)}
         </p>
@@ -609,8 +684,11 @@ const Videos = ({location}, props) => {
       paciente: id,
       fecha: now,
       doctor: data.Doctor_encargado,
+      asistente: data.Asistente,
+      instrumento: data.Instrumento,
       procedimiento: data.Procedimiento,
-      sedante: data.Sedantes
+      sedante: data.Sedantes,
+      motivo_estudio: data.Motivo_del_estudio
     }))
 
     
@@ -636,6 +714,17 @@ const Videos = ({location}, props) => {
   (ipcRenderer.sendSync('get-sedantes')).map((sedante) =>(
     sedanteArray.push([sedante.id, sedante.sedante])
   ))
+
+  let asistenteArray = [];
+  (ipcRenderer.sendSync('get-asistentes')).map((asistente) =>(
+    asistenteArray.push([asistente.id, asistente.asistente])
+  ))
+
+  let instrumentoArray = [];
+  (ipcRenderer.sendSync('get-instrumentos')).map((instrumento) =>(
+    instrumentoArray.push([instrumento.id, instrumento.instrumento])
+  ))
+
 
 
   return (
@@ -681,8 +770,11 @@ const Videos = ({location}, props) => {
         <h3>Rellene el fomulario y seleccione fuente capturadora</h3>
           <Form onSubmit={onSubmit}>
             <Select name="Doctor_encargado" options={doctorArray} />
+            <Input name="Motivo_del_estudio"/>
             <Select name="Procedimiento" options={procedimientoArray} />
             <Select name="Sedantes" options={sedanteArray} />
+            <Select name="Asistente" options={asistenteArray} />
+            <Select name="Instrumento" options={instrumentoArray} />
             <Select name="Device" options={myArray} />
             <Button type="submit" value="Submit" >Comenzar estudio</Button>
           </Form>

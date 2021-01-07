@@ -65,8 +65,11 @@ app.on('ready', () => {
             paciente: arg.paciente,
             fecha: arg.fecha,
             doctor: arg.doctor,
+            asistente: arg.asistente,
+            instrumento: arg.instrumento,
             procedimiento: arg.procedimiento,
-            sedante: arg.sedante
+            sedante: arg.sedante,
+            motivo_estudio: arg.motivo_estudio
         }).returning('id')
         .then(function (id) {
         event.returnValue = id
@@ -475,6 +478,134 @@ app.on('ready', () => {
     ipcMain.on('del-sedante', (event, arg) => {
         const knex = require('knex')(options);
         knex('sedante').where({ 'id': arg.id })
+        .del()
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+        event.returnValue = 'borrado de la base de datos'
+    })
+
+    ipcMain.on('add-asistente', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('asistente').insert({ 
+            asistente: arg.asistente,
+        }).returning('id')
+        .then(function (id) {
+        event.returnValue = id
+        })
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
+
+    ipcMain.on('get-asistentes', (event, arg) => {
+        const knex = require('knex')(options);
+        var asistentes=[];
+        knex.from('asistente').select("*")
+        .then((rows) => {
+            for (row of rows) {
+                var asistente = {
+                    id: row.id, 
+                    asistente: row.asistente,
+                };
+                asistentes.push(asistente);
+            }
+            event.returnValue = asistentes
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
+
+    ipcMain.on('get-asistente', (event, arg) => {
+        const knex = require('knex')(options);
+        var asistente;
+        knex.from('asistente').select("*")
+        .where({ id: arg.sedante_id })
+        .then((rows) => {
+            for (row of rows) {
+                var asistente_row = {
+                    id: row.id,
+                    asistente: row.asistente
+                };
+                asistente = asistente_row;
+            }
+            event.returnValue = asistente
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+    })
+
+    ipcMain.on('del-asistente', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('asistente').where({ 'id': arg.id })
+        .del()
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+        event.returnValue = 'borrado de la base de datos'
+    })
+
+    ipcMain.on('add-instrumento', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('instrumento').insert({ 
+            instrumento: arg.instrumento,
+        }).returning('id')
+        .then(function (id) {
+        event.returnValue = id
+        })
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
+
+    ipcMain.on('get-instrumentos', (event, arg) => {
+        const knex = require('knex')(options);
+        var instrumentos=[];
+        knex.from('instrumento').select("*")
+        .then((rows) => {
+            for (row of rows) {
+                var instrumento = {
+                    id: row.id, 
+                    instrumento: row.instrumento,
+                };
+                instrumentos.push(instrumento);
+            }
+            event.returnValue = instrumentos
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
+
+    ipcMain.on('get-instrumento', (event, arg) => {
+        const knex = require('knex')(options);
+        var instrumento;
+        knex.from('instrumento').select("*")
+        .where({ id: arg.instrumento_id })
+        .then((rows) => {
+            for (row of rows) {
+                var instrumento_row = {
+                    id: row.id,
+                    instrumento: row.instrumento
+                };
+                instrumento = instrumento_row;
+            }
+            event.returnValue = instrumento
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+    })
+
+    ipcMain.on('del-instrumento', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('instrumento').where({ 'id': arg.id })
         .del()
         .catch((err) => { console.log(err); throw err })
         .finally(() => {
