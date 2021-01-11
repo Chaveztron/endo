@@ -168,7 +168,11 @@ app.on('ready', () => {
                     hallazgo: row.hallazgo,
                     doctor: row.doctor,
                     procedimiento: row.procedimiento,
-                    sedante: row.sedante
+                    sedante: row.sedante,
+
+                    motivo_estudio: row.motivo_estudio,
+                    asistente: row.asistente,
+                    instrumento: row.instrumento
                 };
                 sesiones.push(sesion);
             }
@@ -211,7 +215,11 @@ app.on('ready', () => {
                     hallazgo: row.hallazgo,
                     doctor: row.doctor,
                     procedimiento: row.procedimiento,
-                    sedante: row.sedante
+                    sedante: row.sedante,
+
+                    motivo_estudio: row.motivo_estudio,
+                    asistente: row.asistente,
+                    instrumento: row.instrumento
                 };
                 sesion = sesionF;
             }
@@ -236,7 +244,11 @@ app.on('ready', () => {
                     hallazgo: row.hallazgo,
                     doctor: row.doctor,
                     procedimiento: row.procedimiento,
-                    sedante: row.sedante
+                    sedante: row.sedante,
+
+                    motivo_estudio: row.motivo_estudio,
+                    asistente: row.asistente,
+                    instrumento: row.instrumento
                 };
                 sesiones.push(sesion);
             }
@@ -523,7 +535,7 @@ app.on('ready', () => {
         const knex = require('knex')(options);
         var asistente;
         knex.from('asistente').select("*")
-        .where({ id: arg.sedante_id })
+        .where({ id: arg.asistente_id })
         .then((rows) => {
             for (row of rows) {
                 var asistente_row = {

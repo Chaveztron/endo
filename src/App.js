@@ -465,7 +465,10 @@ const toggle = () => {
           <th>Doctor</th>
           <th>Paciente</th>
           <th>Procedimiento</th>
-          <th>acciones</th>
+          <th>Motivo</th>
+          <th>Asistente</th>
+          <th>Instrumento</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -492,6 +495,10 @@ const toggle = () => {
 
 
             <td>{ (ipcRenderer.sendSync('get-procedimiento', {procedimiento_id: estudio.procedimiento})).procedimiento }</td>
+
+            <td>{ estudio.motivo_estudio }</td>
+            <td>{(ipcRenderer.sendSync('get-asistente', {asistente_id: estudio.asistente})).asistente}</td>
+            <td>{(ipcRenderer.sendSync('get-instrumento', {instrumento_id: estudio.instrumento})).instrumento}</td>
             
             <td>
             <NavLink
@@ -504,7 +511,11 @@ const toggle = () => {
               hallazgo: estudio.hallazgo,
               doctor: estudio.doctor,
               procedimiento: estudio.procedimiento,
-              sedante: estudio.sedante
+              sedante: estudio.sedante,
+
+              motivo_estudio: estudio.motivo_estudio,
+              asistente: estudio.asistente,
+              instrumento: estudio.instrumento
             }}}
             >
             <button class="bp3-button bp3-minimal bp3-icon-print"/>
@@ -536,6 +547,10 @@ const Reportes = (props) => {
   const procedimiento = ipcRenderer.sendSync('get-procedimiento', {procedimiento_id: props.location.reporteProps.procedimiento})
   const sedante = ipcRenderer.sendSync('get-sedante', {sedante_id: props.location.reporteProps.sedante})
 
+  const instrumento = ipcRenderer.sendSync('get-instrumento', {instrumento_id: props.location.reporteProps.instrumento})
+  const asistente = ipcRenderer.sendSync('get-asistente', {asistente_id: props.location.reporteProps.asistente})
+  const motivo = props.location.reporteProps.motivo_estudio
+
   let now = new Date().getTime();
 
     const componentRef = useRef();
@@ -550,16 +565,27 @@ const Reportes = (props) => {
     <React.Fragment>
     <Button icon="add" icon="print" onClick={handlePrint}>Imprimir Reporte!!</Button>
     <Container ref={componentRef}>
-    <div className="logo" style={{backgroundColor: "#499ae9", padding: "5px", width: "29%", height: "58px", marginRight: "10px", float: "left" }}>
-    <img src="http://endoclinik.com.mx/wp-content/uploads/2019/05/logobalnco.png" style={{width: "220px"}} />
+    <body className="hoja">
+    <div className="logo" style={{backgroundColor: "#499ae9", padding: "5px", width: "20%", height: "108px", marginRight: "10px", float: "left", borderRadius: "10px" }}>
+    <img src="http://endoclinik.com.mx/wp-content/uploads/2019/05/logobalnco.png" style={{width: "200px", marginTop:"20px"}} />
   </div>
 
-  <div className="titulo" style={{backgroundColor: "#d4e4ef", padding: "5px", textAlign: "center", width: "60%", height: "58px", float: "left"}}>
-    INFORME DEL ESTUDIO ENDOCLINIC<br/>
-    <b>SERVICIO DE ENDOSCOPIA</b>
+  <div className="titulo" style={{backgroundColor: "#d4e4ef", padding: "5px", textAlign: "center", width: "70%", height: "108px", float: "left", borderRadius: "10px"}}>
+      <b>Endoclinik</b>  <br/>
+      ENDOSCOPIA BILIODIGESTIVA-CIRUGIA-LAPAROSCOPIA<br/>
+      TEL. (665)521 2410 USA (682) 558 5825<br/>
+      Eufrasio Santana 324-B, Col. Moderna.Tecate, B.C.<br/>
   </div>
 
-  <table className="tablaI" style={{float: "left", marginTop: "50px", fontSize: "medium", float:"left"}}>
+
+  <div className="esquema" style={{float: "left"}}>
+  <img
+     src={esquema}
+     style={{ width: "250px", float: "left" }}
+  />
+    </div>
+
+  <table className="tablaI" style={{float: "left", marginTop: "0px", fontSize: "medium", float:"left"}}>
     <tr>
       <td><b>Paciente:</b></td>
       <td>
@@ -608,18 +634,32 @@ const Reportes = (props) => {
     </tr>
   </table>
 
-   <div className="esquema" style={{float: "left"}}>
-   <img
-      src={esquema}
-      style={{ width: "300px", float: "left" }}
-   />
-     </div>
+  <table className="tablaI" style={{float: "left", marginTop: "0px", fontSize: "medium", float:"left"}}>
+  <tr>
+    <td><b>Instrumento:</b></td>
+    <td>
+      {instrumento.instrumento}
+    </td>
+  </tr>
+  <tr>
+    <td><b>Asistente:</b></td>
+    <td>
+      {asistente.asistente}
+    </td>
+  </tr>
+  <tr>
+    <td><b>Motivo:</b></td>
+    <td>{motivo}</td>
+  </tr>
+</table>
 
- <div className="fotografias" style={{float:"left"}}>
+
+
+ <div className="fotografias" style={{float:"left", alignContent: "center"}}>
   {capturas.slice(0).map((photo, index) => (
-    <div className="foto" key={{ index }} style={{margin: "10px", textAlign: "center", float: "left"}}>
-    <img src={photo.captura} style={{ width: "225px" }} />
-    <h4 style={{marginTop: "2px"}}>{photo.identificador}-{photo.descripcion}</h4>
+    <div className="foto" key={{ index }} style={{margin: "5px", textAlign: "center", float: "left"}}>
+    <img src={photo.captura} style={{ width: "230px", height: "230px", borderRadius: "10px" }} />
+    <h6 style={{marginTop: "2px"}}>{photo.identificador}-{photo.descripcion}</h6>
   </div>
   ))}
 
@@ -629,9 +669,16 @@ const Reportes = (props) => {
           {ReactHtmlParser(hallazgo)}
         </p>
   </div>
+
+
+  <div className="pie" style={{width: "85%"}}>
+    <b>Endoclinik</b>
+  </div>
+
+  </body>
+
+
     </Container>
-
-
     </React.Fragment>
     )    
 }
@@ -877,7 +924,12 @@ const guardar = () => {
       hallazgo: hallazgo,
       doctor: sesionReporte.doctor,
       procedimiento: sesionReporte.procedimiento,
-      sedante: sesionReporte.sedante
+      sedante: sesionReporte.sedante,
+
+      motivo_estudio: sesionReporte.motivo_estudio,
+      asistente: sesionReporte.asistente,
+      instrumento: sesionReporte.instrumento
+
       }}}
       >
       <Button icon="print" large text="Generar Reporte" intent="success"/>
