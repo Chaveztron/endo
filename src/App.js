@@ -96,6 +96,12 @@ const Configuracion = (props) => {
   const [instrumentos, setInstrumentos] = useState(ipcRenderer.sendSync('get-instrumentos'));
   const [instrumento, setInstrumento] = useState("");
 
+  const [encabezados, setEncabezados] = useState(ipcRenderer.sendSync('get-encabezados'));
+  const [direccion, setDireccion] = useState("");
+  const [empresa, setEmpresa] = useState("");
+  const [giro, setGiro] = useState("");
+  const [telefono, setTelefono] = useState("");
+
   const handleSubmitDoctor = (evt) => {
     evt.preventDefault();
     var idTemp = ipcRenderer.sendSync('add-doctor', { doctor: doctor })
@@ -164,6 +170,21 @@ const Configuracion = (props) => {
     const newInstrumentos = [...instrumentos]
     newInstrumentos.splice(i, 1)
     setInstrumentos(newInstrumentos)
+  }
+
+
+  const handleSubmitEncabezado = (evt) => {
+    evt.preventDefault();
+    var idTemp = ipcRenderer.sendSync('add-encabezado', { direccion: direccion, empresa: empresa, giro: giro, telefono: telefono })
+    setEncabezados(encabezados => [...encabezados,{id: idTemp, direccion: direccion, empresa: empresa, giro: giro, telefono: telefono }])      
+  }
+  const deleteEncabezado = (i) => {
+    console.log(ipcRenderer.sendSync('del-encabezado', {
+      id: encabezados[i].id,
+    }))
+    const newEncabezados = [...encabezados]
+    newEncabezados.splice(i, 1)
+    setEncabezados(newEncabezados)
   }
 
 
@@ -247,6 +268,31 @@ const Configuracion = (props) => {
         {instrumentos.map((instrumento, index) => (      
           <li>{instrumento.id} {instrumento.instrumento}
           <button onClick={() => deleteInstrumento(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
+          </li>
+        ))}
+      </ul>
+
+      <form onSubmit={handleSubmitEncabezado}>
+      <ControlGroup fill={false} vertical={false}>
+      <InputGroup placeholder="Direccion" type="text" value={direccion}
+        onChange={e => setDireccion(e.target.value)} 
+      />
+      <InputGroup placeholder="Empresa" type="text" value={empresa}
+        onChange={e => setEmpresa(e.target.value)} 
+      />
+      <InputGroup placeholder="Giro" type="text" value={giro}
+        onChange={e => setGiro(e.target.value)} 
+      />
+      <InputGroup placeholder="Telefono" type="text" value={telefono}
+        onChange={e => setTelefono(e.target.value)} 
+      />
+      <Button icon="add" type="submit" value="Submit">Agregar Encabezado</Button>
+      </ControlGroup>
+      </form>
+      <ul>
+        {encabezados.map((encabezado, index) => (      
+          <li>{encabezado.id} {encabezado.direccion}
+          <button onClick={() => deleteEncabezado(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>
           </li>
         ))}
       </ul>
@@ -515,7 +561,10 @@ const toggle = () => {
 
               motivo_estudio: estudio.motivo_estudio,
               asistente: estudio.asistente,
-              instrumento: estudio.instrumento
+              instrumento: estudio.instrumento,
+
+              encabezado: estudio.encabezado
+
             }}}
             >
             <button class="bp3-button bp3-minimal bp3-icon-print"/>
@@ -551,6 +600,8 @@ const Reportes = (props) => {
   const asistente = ipcRenderer.sendSync('get-asistente', {asistente_id: props.location.reporteProps.asistente})
   const motivo = props.location.reporteProps.motivo_estudio
 
+  const encabezado = ipcRenderer.sendSync('get-encabezado', {encabezado_id: props.location.reporteProps.encabezado})
+
   let now = new Date().getTime();
 
     const componentRef = useRef();
@@ -571,10 +622,10 @@ const Reportes = (props) => {
   </div>
 
   <div className="titulo" style={{backgroundColor: "#d4e4ef", padding: "5px", textAlign: "center", width: "70%", height: "108px", float: "left", borderRadius: "10px"}}>
-      <b>Endoclinik</b>  <br/>
-      ENDOSCOPIA BILIODIGESTIVA-CIRUGIA-LAPAROSCOPIA<br/>
-      TEL. (665)521 2410 USA (682) 558 5825<br/>
-      Eufrasio Santana 324-B, Col. Moderna.Tecate, B.C.<br/>
+      <b>{encabezado.empresa}</b>  <br/>
+      {encabezado.giro}<br/>
+      {encabezado.telefono}<br/>
+      {encabezado.direccion}<br/>
   </div>
 
 
@@ -672,7 +723,7 @@ const Reportes = (props) => {
 
 
   <div className="pie" style={{width: "85%"}}>
-    <b>Endoclinik</b>
+    <b>{encabezado.empresa}</b>
   </div>
 
   </body>
@@ -735,6 +786,7 @@ const Videos = ({location}, props) => {
       instrumento: data.Instrumento,
       procedimiento: data.Procedimiento,
       sedante: data.Sedantes,
+      encabezado: data.Encabezado,
       motivo_estudio: data.Motivo_del_estudio
     }))
 
@@ -770,6 +822,11 @@ const Videos = ({location}, props) => {
   let instrumentoArray = [];
   (ipcRenderer.sendSync('get-instrumentos')).map((instrumento) =>(
     instrumentoArray.push([instrumento.id, instrumento.instrumento])
+  ))
+
+  let encabezadoArray = [];
+  (ipcRenderer.sendSync('get-encabezados')).map((encabezado) =>(
+    encabezadoArray.push([encabezado.id, encabezado.direccion])
   ))
 
 
@@ -822,6 +879,7 @@ const Videos = ({location}, props) => {
             <Select name="Sedantes" options={sedanteArray} />
             <Select name="Asistente" options={asistenteArray} />
             <Select name="Instrumento" options={instrumentoArray} />
+            <Select name="Encabezado" options={encabezadoArray} />
             <Select name="Device" options={myArray} />
             <Button type="submit" value="Submit" >Comenzar estudio</Button>
           </Form>
@@ -928,7 +986,9 @@ const guardar = () => {
 
       motivo_estudio: sesionReporte.motivo_estudio,
       asistente: sesionReporte.asistente,
-      instrumento: sesionReporte.instrumento
+      instrumento: sesionReporte.instrumento,
+
+      encabezado: sesionReporte.encabezado
 
       }}}
       >

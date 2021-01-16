@@ -69,7 +69,8 @@ app.on('ready', () => {
             instrumento: arg.instrumento,
             procedimiento: arg.procedimiento,
             sedante: arg.sedante,
-            motivo_estudio: arg.motivo_estudio
+            motivo_estudio: arg.motivo_estudio,
+            encabezado: arg.encabezado
         }).returning('id')
         .then(function (id) {
         event.returnValue = id
@@ -219,7 +220,9 @@ app.on('ready', () => {
 
                     motivo_estudio: row.motivo_estudio,
                     asistente: row.asistente,
-                    instrumento: row.instrumento
+                    instrumento: row.instrumento,
+
+                    encabezado: row.encabezado
                 };
                 sesion = sesionF;
             }
@@ -248,7 +251,9 @@ app.on('ready', () => {
 
                     motivo_estudio: row.motivo_estudio,
                     asistente: row.asistente,
-                    instrumento: row.instrumento
+                    instrumento: row.instrumento,
+
+                    encabezado: row.encabezado
                 };
                 sesiones.push(sesion);
             }
@@ -618,6 +623,79 @@ app.on('ready', () => {
     ipcMain.on('del-instrumento', (event, arg) => {
         const knex = require('knex')(options);
         knex('instrumento').where({ 'id': arg.id })
+        .del()
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+        event.returnValue = 'borrado de la base de datos'
+    })
+
+    ipcMain.on('add-encabezado', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('encabezado').insert({ 
+            direccion: arg.direccion,
+            empresa: arg.empresa,
+            giro: arg.giro,
+            telefono: arg.telefono
+        }).returning('id')
+        .then(function (id) {
+        event.returnValue = id
+        })
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
+
+      ipcMain.on('get-encabezados', (event, arg) => {
+        const knex = require('knex')(options);
+        var encabezados=[];
+        knex.from('encabezado').select("*")
+        .then((rows) => {
+            for (row of rows) {
+                var encabezado = {
+                    id: row.id, 
+                    direccion: row.direccion,
+                    empresa: row.empresa,
+                    giro: row.giro,
+                    telefono: row.telefono
+                };
+                encabezados.push(encabezado);
+            }
+            event.returnValue = encabezados
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+      })
+
+      ipcMain.on('get-encabezado', (event, arg) => {
+        const knex = require('knex')(options);
+        var encabezado;
+        knex.from('encabezado').select("*")
+        .where({ id: arg.encabezado_id })
+        .then((rows) => {
+            for (row of rows) {
+                var encabezado_row = {
+                    id: row.id, 
+                    direccion: row.direccion,
+                    empresa: row.empresa,
+                    giro: row.giro,
+                    telefono: row.telefono
+                };
+                encabezado = encabezado_row;
+            }
+            event.returnValue = encabezado
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+    })
+
+    ipcMain.on('del-encabezado', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('encabezado').where({ 'id': arg.id })
         .del()
         .catch((err) => { console.log(err); throw err })
         .finally(() => {
