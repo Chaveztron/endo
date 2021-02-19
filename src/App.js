@@ -309,6 +309,54 @@ const Pacientes = (props) => {
   const [search, setSearch] = useState('');
   const [filteredPacientes, setFilteredPacientes] = useState([]);
 
+  const [nom, setNom] = useState("")
+  const [ap, setAp] = useState("")
+  const [am, setAm] = useState("")
+  const [tel, setTel] = useState("")
+  const [birt, setBirt] = useState("")
+  const [sx, setSx] = useState("")
+  const [idd, setIdd] = useState("")
+
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+
+  const handleShow = (u, i) => {
+    console.log(u)
+    console.log(i)
+
+    setNom(u.nombre)
+    setAp(u.apellido_paterno)
+    setAm(u.apellido_materno)
+    setTel(u.telefono)
+    setBirt(u.nacimiento)
+    setSx(u.genero)
+    setIdd(u.id)
+
+    setShow(true)
+  }
+
+  const handleSubmitPaciente = (evt) => {
+    evt.preventDefault();
+
+    console.log(ipcRenderer.sendSync('update-paciente', {
+      id: idd,
+      nombre: nom,
+      apellido_paterno: ap,
+      apellido_materno: am,
+      genero: sx,
+      nacimiento: birt,
+      telefono: tel
+    }))
+   
+
+    /*
+    var idTemp = ipcRenderer.sendSync('add-instrumento', { instrumento: instrumento })
+    setInstrumentos(instrumentos => [...instrumentos,{id: idTemp, instrumento: instrumento }]) 
+    */     
+   setShow(false)
+   window.location.reload(false)
+  }
+
   useEffect(() => {
     setFilteredPacientes(
       users.filter( user => {
@@ -335,12 +383,13 @@ const Pacientes = (props) => {
       console.log(ipcRenderer.sendSync('del-paciente', {
         id: id,
       }))
- 
   }
 
   const toggle = () => {
     setToggleState(toggleState === false ? true : false)
   }
+
+
 
   return(
     <React.Fragment>
@@ -388,6 +437,7 @@ const Pacientes = (props) => {
             >
             <button class="bp3-button bp3-minimal bp3-icon-document"/>
             </NavLink>
+            <button class="bp3-button bp3-minimal bp3-icon-edit" onClick={() => handleShow(user, index)}/>
             {toggleState?
               <React.Fragment>
               <button onClick={() => deletePaciente(index, user.id)} class="bp3-button bp3-minimal bp3-icon-trash"/>
@@ -398,6 +448,50 @@ const Pacientes = (props) => {
         ))}
       </tbody>
     </table>
+    
+    <Modal
+    show={show}
+    onHide={handleClose}
+    backdrop="static"
+    keyboard={false}
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>Editar paciente</Modal.Title>
+      </Modal.Header>
+        <Modal.Body>
+        <form onSubmit={handleSubmitPaciente}>
+            <ControlGroup fill={false} vertical>
+            <InputGroup placeholder="Nombre" type="text" value={nom}
+              onChange={e => setNom(e.target.value)} 
+            />
+            <InputGroup placeholder="Apellido paterno" type="text" value={ap}
+            onChange={e => setAp(e.target.value)} 
+            />
+            <InputGroup placeholder="Apellido materno" type="text" value={am}
+            onChange={e => setAm(e.target.value)} 
+            />
+            <InputGroup placeholder="Telefono" type="text" value={tel}
+            onChange={e => setTel(e.target.value)} 
+            />
+            <InputGroup placeholder="dd-mm-yyyy" type="date" value={birt}
+            onChange={e => setBirt(e.target.value)} 
+            />
+            <InputGroup placeholder="Genero" type="text" value={sx}
+            onChange={e => setSx(e.target.value)} 
+            />
+            </ControlGroup>
+            <Button variant="primary" type="submit" value="Submit">Aplicar Cambios</Button>
+        </form> 
+        </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>
+          Cancelar
+        </Button>
+        
+      </Modal.Footer>
+    </Modal>
+    
+
     </React.Fragment>
     )    
 }
