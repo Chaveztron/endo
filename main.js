@@ -57,7 +57,7 @@ app.on('ready', () => {
         });
           
         event.returnValue = 'dato insertado'
-      })
+    })
 
     ipcMain.on('update-paciente', (event, arg) => {
         const knex = require('knex')(options);
@@ -97,7 +97,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
     ipcMain.on('add-esquema', (event, arg) => {
         const knex = require('knex')(options);
@@ -108,7 +108,7 @@ app.on('ready', () => {
             knex.destroy();
         });
         event.returnValue = 'esquema insertado'
-      })
+    })
 
     ipcMain.on('add-hallazgo', (event, arg) => {
         const knex = require('knex')(options);
@@ -136,7 +136,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
     
     ipcMain.on('get-pacientes', (event, arg) => {
         const knex = require('knex')(options);
@@ -160,7 +160,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
     ipcMain.on('del-paciente', (event, arg) => {
         const knex = require('knex')(options);
@@ -200,7 +200,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
     ipcMain.on('del-sesion', (event, arg) => {
         const knex = require('knex')(options);
@@ -250,6 +250,27 @@ app.on('ready', () => {
             knex.destroy();
         });
     })
+
+    ipcMain.on('update-sesion', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('sesiones').where({ 'id': arg.id })
+        .update({ 
+            fecha: arg.fecha,
+            hallazgo: arg.hallazgo,
+            doctor: arg.doctor,
+            procedimiento: arg.procedimiento,
+            sedante: arg.sedante,
+            motivo_estudio: arg.motivo_estudio,
+            asistente: arg.asistente,
+            instrumento: arg.instrumento,
+            encabezado: arg.encabezado
+        })
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+        event.returnValue = 'sesion actualizada'
+    })
     
     ipcMain.on('get-todas_sesiones', (event, arg) => {
         const knex = require('knex')(options);
@@ -280,7 +301,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
     
     ipcMain.on('get-capturas', (event, arg) => {
         const knex = require('knex')(options);
@@ -341,7 +362,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
     ipcMain.on('get-doctores', (event, arg) => {
         const knex = require('knex')(options);
@@ -360,7 +381,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
     
     ipcMain.on('get-doctor', (event, arg) => {
         const knex = require('knex')(options);
@@ -405,7 +426,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
     ipcMain.on('get-procedimientos', (event, arg) => {
         const knex = require('knex')(options);
@@ -424,7 +445,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
     ipcMain.on('get-procedimiento', (event, arg) => {
         const knex = require('knex')(options);
@@ -469,7 +490,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
     ipcMain.on('get-sedantes', (event, arg) => {
         const knex = require('knex')(options);
@@ -488,7 +509,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
     ipcMain.on('get-sedante', (event, arg) => {
         const knex = require('knex')(options);
@@ -533,7 +554,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
     ipcMain.on('get-asistentes', (event, arg) => {
         const knex = require('knex')(options);
@@ -552,7 +573,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
     ipcMain.on('get-asistente', (event, arg) => {
         const knex = require('knex')(options);
@@ -597,7 +618,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
     ipcMain.on('get-instrumentos', (event, arg) => {
         const knex = require('knex')(options);
@@ -616,7 +637,7 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
     ipcMain.on('get-instrumento', (event, arg) => {
         const knex = require('knex')(options);
@@ -664,9 +685,9 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
-      ipcMain.on('get-encabezados', (event, arg) => {
+    ipcMain.on('get-encabezados', (event, arg) => {
         const knex = require('knex')(options);
         var encabezados=[];
         knex.from('encabezado').select("*")
@@ -686,9 +707,9 @@ app.on('ready', () => {
         .finally(() => {
             knex.destroy();
         });
-      })
+    })
 
-      ipcMain.on('get-encabezado', (event, arg) => {
+    ipcMain.on('get-encabezado', (event, arg) => {
         const knex = require('knex')(options);
         var encabezado;
         knex.from('encabezado').select("*")
