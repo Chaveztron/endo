@@ -12,6 +12,11 @@ import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import ReactHtmlParser from 'react-html-parser';
 
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { ListContainer, ListItem } from "./styles";
+
+
+
 const { ipcRenderer } = window.require("electron");
 
 const App = () => {
@@ -587,7 +592,7 @@ const toggle = () => {
 
 const EdicionInforme = (props) => {
 
-  const [capturas, setCapturas] = useState(ipcRenderer.sendSync('get-capturas', {
+const [capturas, setCapturas] = useState(ipcRenderer.sendSync('get-capturas', {
     sesion_id:  props.location.props.idReporte
   }))
   const [date, setDate] = useState("")
@@ -654,25 +659,9 @@ const EdicionInforme = (props) => {
     doctorArray.push([doctor.id, doctor.doctor])
   ))
    
-  
-  
-
-  
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
-
-  
-    console.log(date)
-    console.log(doc)
-    console.log(proc)
-    console.log(sed)
-    console.log(mot)
-    console.log(asis)
-    console.log(ins)
-    console.log(enc)
-    console.log(datos)
-
     console.log(ipcRenderer.sendSync('update-sesion', {
       id: props.location.props.idReporte,
       fecha: Date.parse(date),
@@ -685,16 +674,11 @@ const EdicionInforme = (props) => {
       instrumento: ins,
       encabezado: enc,
     }))
-    
-
   }
 
   return(
     <React.Fragment>
-
     <h3>Datos del estudio {sesionReporte.id} ({paciente.nombre+' '+paciente.apellido_paterno+' '+paciente.apellido_materno})</h3>
-
-      
       <h6> Fecha: 
       {new Intl.DateTimeFormat("default", {
         day: "2-digit"
@@ -728,9 +712,6 @@ const EdicionInforme = (props) => {
           </select>
       </div>
       </label>
-
-    
-
       <label class="bp3-label bp3-inline"> Procedimiento
       <div class="bp3-select" >
           <select onChange={e => setProc(e.target.value)}>
@@ -742,7 +723,6 @@ const EdicionInforme = (props) => {
           </select>
       </div>
       </label>
-
       <label class="bp3-label bp3-inline"> Sedante
       <div class="bp3-select" >
           <select onChange={e => setSed(e.target.value)}>
@@ -754,11 +734,8 @@ const EdicionInforme = (props) => {
           </select>
       </div>
       </label>
-
       <label class="bp3-label bp3-inline"> Motivo del estudio:
       <input placeholder="Apellido materno" type="text" value={mot} onChange={e => setMot(e.target.value)}/></label>
-
-
       <label class="bp3-label bp3-inline"> Asistente
       <div class="bp3-select" >
           <select onChange={e => setAsis(e.target.value)}>
@@ -770,8 +747,6 @@ const EdicionInforme = (props) => {
           </select>
       </div>
       </label>
-
-
       <label class="bp3-label bp3-inline"> Instrumento
       <div class="bp3-select" >
           <select onChange={e => setIns(e.target.value)}>
@@ -783,7 +758,6 @@ const EdicionInforme = (props) => {
           </select>
       </div>
       </label>
-
       <label class="bp3-label bp3-inline"> Encabezado
       <div class="bp3-select" >
           <select onChange={e => setEnc(e.target.value)}>
@@ -795,28 +769,77 @@ const EdicionInforme = (props) => {
           </select>
       </div>
       </label>
-
       <button type="submit">Guardar Cambios</button>
       </form>
-
-
       <CKEditor
       editor={ClassicEditor}
       onChange={handleOnChage}
       data = {datos}
       />
 
-      <h3>Fotografias</h3>
 
-      <div className="fotografias" style={{float:"left", alignContent: "center"}}>
-      {capturas.slice(0).map((photo, index) => (
-        <div className="foto" key={{ index }} style={{margin: "5px", textAlign: "center", float: "left"}}>
-        <img src={photo.captura} style={{ width: "230px", height: "230px", borderRadius: "10px" }} />
-        <h6 style={{marginTop: "2px"}}>{photo.identificador}-{photo.descripcion}</h6>
-      </div>
-      ))}
+     
+      <h3>Fotografias</h3>
+      <DragDropContext 
+      onDragEnd={(param) => {
+        const srcI = param.source.index;
+        const desI = param.destination?.index;
+        if (desI) {
+          capturas.splice(desI, 0, capturas.splice(srcI, 1)[0]);
+          setCapturas(capturas)
+        }
+      }}
+      
+      >       
+   
+
     
-     </div>
+      <Droppable droppableId="droppable-1" direction="horizontal" style={{ border: 'solid black', width: "1000px", height: "800px"}}>
+      {(provided, _) => (
+            <div ref={provided.innerRef} {...provided.droppableProps} >
+            {capturas.slice(0).map((photo, index) => (
+              <Draggable key={photo.identificador} draggableId={"draggable-"+photo.identificador} index={index}>
+              {(provided, snapshot) => (
+                <div  key={{ index }}  ref={provided.innerRef}
+                {...provided.draggableProps}
+                style={{
+                  ...provided.draggableProps.style,
+                  margin: "20px", textAlign: "center", float: 'left',
+                  boxShadow: snapshot.isDragging
+                    ? "0 0 .4rem #666"
+                    : "none",
+                }}>
+
+
+  
+
+                <img src={photo.captura} style={{ width: "230px", height: "230px", borderRadius: "10px" }} {...provided.dragHandleProps}/>
+                <label class="bp3-control bp3-checkbox bp3-align-right">
+                <input type="checkbox" class="bp3-large" />
+                <span class="bp3-control-indicator"></span>
+                {index+1}-{photo.descripcion}
+              </label>
+
+
+                
+                
+                
+
+
+
+
+                </div>
+              )}
+              </Draggable>
+            ))}
+          </div>
+      )}
+
+     </Droppable>
+   
+     
+    
+     </DragDropContext>
 
     </React.Fragment>
     )    
