@@ -263,7 +263,8 @@ app.on('ready', () => {
             motivo_estudio: arg.motivo_estudio,
             asistente: arg.asistente,
             instrumento: arg.instrumento,
-            encabezado: arg.encabezado
+            encabezado: arg.encabezado,
+            esquema: arg.esquema
         })
         .catch((err) => { console.log(err); throw err })
         .finally(() => {

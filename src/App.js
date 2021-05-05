@@ -1189,6 +1189,7 @@ const EdicionInforme = (props) => {
   const [capturas, setCapturas] = useState(ipcRenderer.sendSync('get-capturas', {
       sesion_id:  props.location.props.idReporte
     }))
+    const [esquema, setEsquema] = React.useState("")
     const [date, setDate] = useState("")
     const [doc, setDoc] = useState("")
     const [proc, setProc] = useState("")
@@ -1214,7 +1215,30 @@ const EdicionInforme = (props) => {
       setIns(sesionReporte.instrumento)
       setEnc(sesionReporte.encabezado)
       setDatos(sesionReporte.hallazgo)
+      setEsquema(sesionReporte.esquema)
     },[]);
+
+    const [imageCode, setImageCode] = React.useState()
+    const [imageCodeIndex, setImageCodeIndex] = React.useState()
+  
+    const [photoEdit, setphotoEdit] = React.useState("")
+
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    //const handleShow = () => setShow(true);
+  
+    const handleShow = (i) => {
+      setImageCode(capturas[i].captura)
+      setImageCodeIndex(i)
+      setShow(true)
+    }
+
+    const editPhoto = (i) => {
+      const Photos = [...capturas]
+      Photos[i].captura = photoEdit
+      setCapturas(Photos)
+      setShow(false)
+    }
   
     const handleOnChage = (e, editor) => {
       setDatos(editor.getData())
@@ -1281,6 +1305,7 @@ const EdicionInforme = (props) => {
         asistente: asis,
         instrumento: ins,
         encabezado: enc,
+        esquema: esquema
       }))
     }
   
@@ -1303,83 +1328,89 @@ const EdicionInforme = (props) => {
         }).format(sesionReporte.fecha)}
         </h6>
   
-  
-        <form onSubmit={handleSubmit}>
-  
-        <label class="bp3-label bp3-inline"> Fecha del estudio:
-        <input placeholder="Apellido materno" type="date" value={date} onChange={e => setDate(e.target.value)}/></label>
-  
-        <label class="bp3-label bp3-inline"> Doctor
-        <div class="bp3-select" >
-            <select onChange={e => setDoc(e.target.value)}>
-              { doctorArray.map(value => (
-                <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.doctor?true:false}>
-                  {value[1]}
-                </option>
-              ))}
-            </select>
-        </div>
-        </label>
-        <label class="bp3-label bp3-inline"> Procedimiento
-        <div class="bp3-select" >
-            <select onChange={e => setProc(e.target.value)}>
-              {procedimientoArray.map(value => (
-                <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.procedimiento?true:false}>
-                  {value[1]}
-                </option>
-              ))}
-            </select>
-        </div>
-        </label>
-        <label class="bp3-label bp3-inline"> Sedante
-        <div class="bp3-select" >
-            <select onChange={e => setSed(e.target.value)}>
-              {sedanteArray.map(value => (
-                <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.sedante?true:false}>
-                  {value[1]}
-                </option>
-              ))}
-            </select>
-        </div>
-        </label>
-        <label class="bp3-label bp3-inline"> Motivo del estudio:
-        <input placeholder="Apellido materno" type="text" value={mot} onChange={e => setMot(e.target.value)}/></label>
-        <label class="bp3-label bp3-inline"> Asistente
-        <div class="bp3-select" >
-            <select onChange={e => setAsis(e.target.value)}>
-              {asistenteArray.map(value => (
-                <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.asistente?true:false}>
-                  {value[1]}
-                </option>
-              ))}
-            </select>
-        </div>
-        </label>
-        <label class="bp3-label bp3-inline"> Instrumento
-        <div class="bp3-select" >
-            <select onChange={e => setIns(e.target.value)}>
-              {instrumentoArray.map(value => (
-                <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.instrumento?true:false}>
-                  {value[1]}
-                </option>
-              ))}
-            </select>
-        </div>
-        </label>
-        <label class="bp3-label bp3-inline"> Encabezado
-        <div class="bp3-select" >
-            <select onChange={e => setEnc(e.target.value)}>
-              {encabezadoArray.map(value => (
-                <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.encabezado?true:false}>
-                  {value[1]}
-                </option>
-              ))}
-            </select>
-        </div>
-        </label>
-        <button type="submit">Guardar Cambios</button>
-        </form>
-
+        <Container fluid>
+        <Row>     
+          <Col >
+                  <form onSubmit={handleSubmit}>
+                  <label class="bp3-label bp3-inline"> Fecha del estudio:
+                  <input placeholder="Apellido materno" type="date" value={date} onChange={e => setDate(e.target.value)}/></label>
+            
+                  <label class="bp3-label bp3-inline"> Doctor
+                  <div class="bp3-select" >
+                      <select onChange={e => setDoc(e.target.value)}>
+                        { doctorArray.map(value => (
+                          <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.doctor?true:false}>
+                            {value[1]}
+                          </option>
+                        ))}
+                      </select>
+                  </div>
+                  </label>
+                  <label class="bp3-label bp3-inline"> Procedimiento
+                  <div class="bp3-select" >
+                      <select onChange={e => setProc(e.target.value)}>
+                        {procedimientoArray.map(value => (
+                          <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.procedimiento?true:false}>
+                            {value[1]}
+                          </option>
+                        ))}
+                      </select>
+                  </div>
+                  </label>
+                  <label class="bp3-label bp3-inline"> Sedante
+                  <div class="bp3-select" >
+                      <select onChange={e => setSed(e.target.value)}>
+                        {sedanteArray.map(value => (
+                          <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.sedante?true:false}>
+                            {value[1]}
+                          </option>
+                        ))}
+                      </select>
+                  </div>
+                  </label>
+                  <label class="bp3-label bp3-inline"> Motivo del estudio:
+                  <input placeholder="Motivo del estudio" type="text" value={mot} onChange={e => setMot(e.target.value)}/></label>
+                  <label class="bp3-label bp3-inline"> Asistente
+                  <div class="bp3-select" >
+                      <select onChange={e => setAsis(e.target.value)}>
+                        {asistenteArray.map(value => (
+                          <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.asistente?true:false}>
+                            {value[1]}
+                          </option>
+                        ))}
+                      </select>
+                  </div>
+                  </label>
+                  <label class="bp3-label bp3-inline"> Instrumento
+                  <div class="bp3-select" >
+                      <select onChange={e => setIns(e.target.value)}>
+                        {instrumentoArray.map(value => (
+                          <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.instrumento?true:false}>
+                            {value[1]}
+                          </option>
+                        ))}
+                      </select>
+                  </div>
+                  </label>
+                  <label class="bp3-label bp3-inline"> Encabezado
+                  <div class="bp3-select" >
+                      <select onChange={e => setEnc(e.target.value)}>
+                        {encabezadoArray.map(value => (
+                          <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.encabezado?true:false}>
+                            {value[1]}
+                          </option>
+                        ))}
+                      </select>
+                  </div>
+                  </label>
+                  <button type="submit">Guardar Cambios</button>
+                  </form>
+        </Col>
+        <Col >
+            <HomePage dataImage={image => setEsquema(image)} photo={sesionReporte.esquema}/>
+        </Col>
+        </Row>
+      </Container>
   
        
         <h3>Fotografias</h3>
@@ -1398,7 +1429,7 @@ const EdicionInforme = (props) => {
         <Droppable droppableId="droppable-1" direction="horizontal">
         {(provided, _) => (
               <div ref={provided.innerRef} {...provided.droppableProps} style={{ display: "flex", padding: "grid", width: capturas.length*230}}>
-              {capturas.slice(0).map((photo, index) => (
+              {capturas.map((photo, index) => (
                 <Draggable key={photo.identificador} draggableId={"draggable-"+photo.identificador} index={index}>
                 {(provided, snapshot) => (
                   <div  key={{ index }}  ref={provided.innerRef}
@@ -1419,6 +1450,7 @@ const EdicionInforme = (props) => {
                     </label>
                     <img src={photo.captura} style={{ width: "230px", height: "230px", borderRadius: "10px" }} {...provided.dragHandleProps}/>
                     <input  type="text" name="name" value={photo.descripcion} onChange={updateFieldChanged(index)}  />
+                    <button onClick={() => handleShow(index)} class="bp3-button bp3-minimal bp3-icon-edit"/>
 
                   </div>
                 )}
@@ -1435,6 +1467,28 @@ const EdicionInforme = (props) => {
        onChange={handleOnChage}
        data = {datos}
        />
+
+       <Modal
+       show={show}
+       onHide={handleClose}
+       backdrop="static"
+       keyboard={false}
+       >
+         <Modal.Header closeButton>
+           <Modal.Title>Edición de fotografía</Modal.Title>
+         </Modal.Header>
+           <Modal.Body>
+           <HomePage dataImage={image => setphotoEdit(image)} photo={imageCode}/>
+           
+           </Modal.Body>
+         <Modal.Footer>
+           <Button variant="secondary" onClick={handleClose}>
+             Cancelar
+           </Button>
+           <Button variant="primary" onClick={() => editPhoto(imageCodeIndex)}>Aplicar Cambios</Button>
+         </Modal.Footer>
+        </Modal>
+
       </React.Fragment>
       )    
   }
