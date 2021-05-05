@@ -590,250 +590,7 @@ const toggle = () => {
     )    
 }
 
-const EdicionInforme = (props) => {
 
-const [capturas, setCapturas] = useState(ipcRenderer.sendSync('get-capturas', {
-    sesion_id:  props.location.props.idReporte
-  }))
-  const [date, setDate] = useState("")
-  const [doc, setDoc] = useState("")
-  const [proc, setProc] = useState("")
-  const [sed, setSed] = useState("")
-  const [mot, setMot] = useState("")
-  const [asis, setAsis] = useState("")
-  const [ins, setIns] = useState("")
-  const [enc, setEnc] = useState("")
-  const [datos, setDatos] = useState("")
-
-  useEffect(() => {
-    var dia = new Intl.DateTimeFormat("default", {day: "2-digit"}).format(sesionReporte.fecha)
-    var mes = new Intl.DateTimeFormat("default", {month: "2-digit"}).format(sesionReporte.fecha)
-    var years = new Intl.DateTimeFormat("default", {year: "numeric"}).format(sesionReporte.fecha)
-    var fecha = years+"-"+mes+"-"+dia
-    // Update the document title using the browser API
-    setDate(fecha)
-    setDoc(sesionReporte.doctor)
-    setProc(sesionReporte.procedimiento)
-    setSed(sesionReporte.sedante)
-    setMot(sesionReporte.motivo_estudio)
-    setAsis(sesionReporte.asistente)
-    setIns(sesionReporte.instrumento)
-    setEnc(sesionReporte.encabezado)
-    setDatos(sesionReporte.hallazgo)
-  },[]);
-
-  const handleOnChage = (e, editor) => {
-    setDatos(editor.getData())
-  }
-
-  const updateCheckChanged = index => e => {
-    console.log(index)
-    console.log(e.target.checked)
-    let newArr = [...capturas]; // copying the old datas array
-    newArr[index].visible = e.target.checked; // replace e.target.value with whatever you want to change it to
-    setCapturas(newArr); // ??
-  }
-  
-  var sesionReporte = ipcRenderer.sendSync('get-sesion', {
-    sesion_id: props.location.props.idReporte,
-  })
-  var paciente = ipcRenderer.sendSync('get-paciente', {
-    paciente_id: sesionReporte.paciente,
-  })
-
-  let procedimientoArray = [];
-  (ipcRenderer.sendSync('get-procedimientos')).map((procedimiento) =>(
-    procedimientoArray.push([procedimiento.id, procedimiento.procedimiento])
-  ))
-
-  let sedanteArray = [];
-  (ipcRenderer.sendSync('get-sedantes')).map((sedante) =>(
-    sedanteArray.push([sedante.id, sedante.sedante])
-  ))
-  let asistenteArray = [];
-  (ipcRenderer.sendSync('get-asistentes')).map((asistente) =>(
-    asistenteArray.push([asistente.id, asistente.asistente])
-  ))
-  let instrumentoArray = [];
-  (ipcRenderer.sendSync('get-instrumentos')).map((instrumento) =>(
-    instrumentoArray.push([instrumento.id, instrumento.instrumento])
-  ))
-  let encabezadoArray = [];
-  (ipcRenderer.sendSync('get-encabezados')).map((encabezado) =>(
-    encabezadoArray.push([encabezado.id, encabezado.direccion])
-  ))
-  let doctorArray = [];
-  (ipcRenderer.sendSync('get-doctores')).map((doctor) =>(
-    doctorArray.push([doctor.id, doctor.doctor])
-  ))
-   
-
-  const handleSubmit = (evt) => {
-    evt.preventDefault();
-    console.log(ipcRenderer.sendSync('update-sesion', {
-      id: props.location.props.idReporte,
-      fecha: Date.parse(date),
-      hallazgo: datos,
-      doctor: doc,
-      procedimiento: proc,
-      sedante: sed,
-      motivo_estudio: mot,
-      asistente: asis,
-      instrumento: ins,
-      encabezado: enc,
-    }))
-  }
-
-  return(
-    <React.Fragment>
-    <h3>Datos del estudio {sesionReporte.id} ({paciente.nombre+' '+paciente.apellido_paterno+' '+paciente.apellido_materno})</h3>
-      <h6> Fecha: 
-      {new Intl.DateTimeFormat("default", {
-        day: "2-digit"
-      }).format(sesionReporte.fecha)}/
-      {new Intl.DateTimeFormat("default", {
-        month: "2-digit"
-      }).format(sesionReporte.fecha)}/
-      {new Intl.DateTimeFormat("default", {
-        year: "numeric"
-      }).format(sesionReporte.fecha)} {new Intl.DateTimeFormat("default", {
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric'
-      }).format(sesionReporte.fecha)}
-      </h6>
-
-
-      <form onSubmit={handleSubmit}>
-
-      <label class="bp3-label bp3-inline"> Fecha del estudio:
-      <input placeholder="Apellido materno" type="date" value={date} onChange={e => setDate(e.target.value)}/></label>
-
-      <label class="bp3-label bp3-inline"> Doctor
-      <div class="bp3-select" >
-          <select onChange={e => setDoc(e.target.value)}>
-            { doctorArray.map(value => (
-              <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.doctor?true:false}>
-                {value[1]}
-              </option>
-            ))}
-          </select>
-      </div>
-      </label>
-      <label class="bp3-label bp3-inline"> Procedimiento
-      <div class="bp3-select" >
-          <select onChange={e => setProc(e.target.value)}>
-            {procedimientoArray.map(value => (
-              <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.procedimiento?true:false}>
-                {value[1]}
-              </option>
-            ))}
-          </select>
-      </div>
-      </label>
-      <label class="bp3-label bp3-inline"> Sedante
-      <div class="bp3-select" >
-          <select onChange={e => setSed(e.target.value)}>
-            {sedanteArray.map(value => (
-              <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.sedante?true:false}>
-                {value[1]}
-              </option>
-            ))}
-          </select>
-      </div>
-      </label>
-      <label class="bp3-label bp3-inline"> Motivo del estudio:
-      <input placeholder="Apellido materno" type="text" value={mot} onChange={e => setMot(e.target.value)}/></label>
-      <label class="bp3-label bp3-inline"> Asistente
-      <div class="bp3-select" >
-          <select onChange={e => setAsis(e.target.value)}>
-            {asistenteArray.map(value => (
-              <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.asistente?true:false}>
-                {value[1]}
-              </option>
-            ))}
-          </select>
-      </div>
-      </label>
-      <label class="bp3-label bp3-inline"> Instrumento
-      <div class="bp3-select" >
-          <select onChange={e => setIns(e.target.value)}>
-            {instrumentoArray.map(value => (
-              <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.instrumento?true:false}>
-                {value[1]}
-              </option>
-            ))}
-          </select>
-      </div>
-      </label>
-      <label class="bp3-label bp3-inline"> Encabezado
-      <div class="bp3-select" >
-          <select onChange={e => setEnc(e.target.value)}>
-            {encabezadoArray.map(value => (
-              <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.encabezado?true:false}>
-                {value[1]}
-              </option>
-            ))}
-          </select>
-      </div>
-      </label>
-      <button type="submit">Guardar Cambios</button>
-      </form>
-      <CKEditor
-      editor={ClassicEditor}
-      onChange={handleOnChage}
-      data = {datos}
-      />
-
-     
-      <h3>Fotografias</h3>
-
-      <div style={{height: 290,  backgroundColor: 'khaki', overflow: "scroll"}}>
-      <DragDropContext 
-      onDragEnd={(param) => {
-        const srcI = param.source.index;
-        const desI = param.destination?.index;
-        if (desI) {
-          capturas.splice(desI, 0, capturas.splice(srcI, 1)[0]);
-          setCapturas(capturas)
-        }
-      }}
-      >       
-      <Droppable droppableId="droppable-1" direction="horizontal">
-      {(provided, _) => (
-            <div ref={provided.innerRef} {...provided.droppableProps} style={{ display: "flex", padding: "grid", width: capturas.length*230}}>
-            {capturas.slice(0).map((photo, index) => (
-              <Draggable key={photo.identificador} draggableId={"draggable-"+photo.identificador} index={index}>
-              {(provided, snapshot) => (
-                <div  key={{ index }}  ref={provided.innerRef}
-                {...provided.draggableProps}
-                style={{
-                  ...provided.draggableProps.style,
-                  userSelect: "none",
-                  padding: "grid * 2",
-                  margin: `0 2px 0 0`,
-                  boxShadow: snapshot.isDragging
-                    ? "0 0 .4rem #666"
-                    : "none",
-                }}>
-                  <img src={photo.captura} style={{ width: "230px", height: "230px", borderRadius: "10px" }} {...provided.dragHandleProps}/>
-                    <label class="bp3-control bp3-checkbox bp3-align-right">
-                      <input type="checkbox" class="bp3-large" checked={photo.visible} onChange={updateCheckChanged(index)}/>
-                      <span class="bp3-control-indicator"></span>
-                      {index+1}-{photo.descripcion}
-                    </label>
-                </div>
-              )}
-              </Draggable>
-            ))}
-          </div>
-      )}
-     </Droppable>
-     </DragDropContext>
-     </div>
-    </React.Fragment>
-    )    
-}
 
 const Sesiones = (props) => {
   const [sesiones, setSesiones] = useState(ipcRenderer.sendSync('get-todas_sesiones').reverse())
@@ -1427,6 +1184,259 @@ const guardar = () => {
     )    
 }
 
+const EdicionInforme = (props) => {
 
+  const [capturas, setCapturas] = useState(ipcRenderer.sendSync('get-capturas', {
+      sesion_id:  props.location.props.idReporte
+    }))
+    const [date, setDate] = useState("")
+    const [doc, setDoc] = useState("")
+    const [proc, setProc] = useState("")
+    const [sed, setSed] = useState("")
+    const [mot, setMot] = useState("")
+    const [asis, setAsis] = useState("")
+    const [ins, setIns] = useState("")
+    const [enc, setEnc] = useState("")
+    const [datos, setDatos] = useState("")
+  
+    useEffect(() => {
+      var dia = new Intl.DateTimeFormat("default", {day: "2-digit"}).format(sesionReporte.fecha)
+      var mes = new Intl.DateTimeFormat("default", {month: "2-digit"}).format(sesionReporte.fecha)
+      var years = new Intl.DateTimeFormat("default", {year: "numeric"}).format(sesionReporte.fecha)
+      var fecha = years+"-"+mes+"-"+dia
+      // Update the document title using the browser API
+      setDate(fecha)
+      setDoc(sesionReporte.doctor)
+      setProc(sesionReporte.procedimiento)
+      setSed(sesionReporte.sedante)
+      setMot(sesionReporte.motivo_estudio)
+      setAsis(sesionReporte.asistente)
+      setIns(sesionReporte.instrumento)
+      setEnc(sesionReporte.encabezado)
+      setDatos(sesionReporte.hallazgo)
+    },[]);
+  
+    const handleOnChage = (e, editor) => {
+      setDatos(editor.getData())
+    }
+  
+    const updateCheckChanged = index => e => {
+      console.log(index)
+      console.log(e.target.checked)
+      let newArr = [...capturas]; // copying the old datas array
+      newArr[index].visible = e.target.checked; // replace e.target.value with whatever you want to change it to
+      setCapturas(newArr); // ??
+    }
+
+    const updateFieldChanged = index => e => {
+      let newArr = [...capturas]; // copying the old datas array
+      newArr[index].descripcion = e.target.value; // replace e.target.value with whatever you want to change it to
+      setCapturas(newArr); // ??
+    }
+    
+    var sesionReporte = ipcRenderer.sendSync('get-sesion', {
+      sesion_id: props.location.props.idReporte,
+    })
+    var paciente = ipcRenderer.sendSync('get-paciente', {
+      paciente_id: sesionReporte.paciente,
+    })
+  
+    let procedimientoArray = [];
+    (ipcRenderer.sendSync('get-procedimientos')).map((procedimiento) =>(
+      procedimientoArray.push([procedimiento.id, procedimiento.procedimiento])
+    ))
+  
+    let sedanteArray = [];
+    (ipcRenderer.sendSync('get-sedantes')).map((sedante) =>(
+      sedanteArray.push([sedante.id, sedante.sedante])
+    ))
+    let asistenteArray = [];
+    (ipcRenderer.sendSync('get-asistentes')).map((asistente) =>(
+      asistenteArray.push([asistente.id, asistente.asistente])
+    ))
+    let instrumentoArray = [];
+    (ipcRenderer.sendSync('get-instrumentos')).map((instrumento) =>(
+      instrumentoArray.push([instrumento.id, instrumento.instrumento])
+    ))
+    let encabezadoArray = [];
+    (ipcRenderer.sendSync('get-encabezados')).map((encabezado) =>(
+      encabezadoArray.push([encabezado.id, encabezado.direccion])
+    ))
+    let doctorArray = [];
+    (ipcRenderer.sendSync('get-doctores')).map((doctor) =>(
+      doctorArray.push([doctor.id, doctor.doctor])
+    ))
+     
+  
+    const handleSubmit = (evt) => {
+      evt.preventDefault();
+      console.log(ipcRenderer.sendSync('update-sesion', {
+        id: props.location.props.idReporte,
+        fecha: Date.parse(date),
+        hallazgo: datos,
+        doctor: doc,
+        procedimiento: proc,
+        sedante: sed,
+        motivo_estudio: mot,
+        asistente: asis,
+        instrumento: ins,
+        encabezado: enc,
+      }))
+    }
+  
+    return(
+      <React.Fragment>
+      <h3>Datos del estudio {sesionReporte.id} ({paciente.nombre+' '+paciente.apellido_paterno+' '+paciente.apellido_materno})</h3>
+        <h6> Fecha: 
+        {new Intl.DateTimeFormat("default", {
+          day: "2-digit"
+        }).format(sesionReporte.fecha)}/
+        {new Intl.DateTimeFormat("default", {
+          month: "2-digit"
+        }).format(sesionReporte.fecha)}/
+        {new Intl.DateTimeFormat("default", {
+          year: "numeric"
+        }).format(sesionReporte.fecha)} {new Intl.DateTimeFormat("default", {
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric'
+        }).format(sesionReporte.fecha)}
+        </h6>
+  
+  
+        <form onSubmit={handleSubmit}>
+  
+        <label class="bp3-label bp3-inline"> Fecha del estudio:
+        <input placeholder="Apellido materno" type="date" value={date} onChange={e => setDate(e.target.value)}/></label>
+  
+        <label class="bp3-label bp3-inline"> Doctor
+        <div class="bp3-select" >
+            <select onChange={e => setDoc(e.target.value)}>
+              { doctorArray.map(value => (
+                <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.doctor?true:false}>
+                  {value[1]}
+                </option>
+              ))}
+            </select>
+        </div>
+        </label>
+        <label class="bp3-label bp3-inline"> Procedimiento
+        <div class="bp3-select" >
+            <select onChange={e => setProc(e.target.value)}>
+              {procedimientoArray.map(value => (
+                <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.procedimiento?true:false}>
+                  {value[1]}
+                </option>
+              ))}
+            </select>
+        </div>
+        </label>
+        <label class="bp3-label bp3-inline"> Sedante
+        <div class="bp3-select" >
+            <select onChange={e => setSed(e.target.value)}>
+              {sedanteArray.map(value => (
+                <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.sedante?true:false}>
+                  {value[1]}
+                </option>
+              ))}
+            </select>
+        </div>
+        </label>
+        <label class="bp3-label bp3-inline"> Motivo del estudio:
+        <input placeholder="Apellido materno" type="text" value={mot} onChange={e => setMot(e.target.value)}/></label>
+        <label class="bp3-label bp3-inline"> Asistente
+        <div class="bp3-select" >
+            <select onChange={e => setAsis(e.target.value)}>
+              {asistenteArray.map(value => (
+                <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.asistente?true:false}>
+                  {value[1]}
+                </option>
+              ))}
+            </select>
+        </div>
+        </label>
+        <label class="bp3-label bp3-inline"> Instrumento
+        <div class="bp3-select" >
+            <select onChange={e => setIns(e.target.value)}>
+              {instrumentoArray.map(value => (
+                <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.instrumento?true:false}>
+                  {value[1]}
+                </option>
+              ))}
+            </select>
+        </div>
+        </label>
+        <label class="bp3-label bp3-inline"> Encabezado
+        <div class="bp3-select" >
+            <select onChange={e => setEnc(e.target.value)}>
+              {encabezadoArray.map(value => (
+                <option key={value[0]} value={value[0]} selected={value[0] === sesionReporte.encabezado?true:false}>
+                  {value[1]}
+                </option>
+              ))}
+            </select>
+        </div>
+        </label>
+        <button type="submit">Guardar Cambios</button>
+        </form>
+
+  
+       
+        <h3>Fotografias</h3>
+  
+        <div style={{height: 320, paddingTop: '30px',  backgroundColor: 'khaki', overflow: "scroll"}}>
+        <DragDropContext 
+        onDragEnd={(param) => {
+          const srcI = param.source.index;
+          const desI = param.destination?.index;
+          if (desI) {
+            capturas.splice(desI, 0, capturas.splice(srcI, 1)[0]);
+            setCapturas(capturas)
+          }
+        }}
+        >       
+        <Droppable droppableId="droppable-1" direction="horizontal">
+        {(provided, _) => (
+              <div ref={provided.innerRef} {...provided.droppableProps} style={{ display: "flex", padding: "grid", width: capturas.length*230}}>
+              {capturas.slice(0).map((photo, index) => (
+                <Draggable key={photo.identificador} draggableId={"draggable-"+photo.identificador} index={index}>
+                {(provided, snapshot) => (
+                  <div  key={{ index }}  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  style={{
+                    ...provided.draggableProps.style,
+                    userSelect: "none",
+                    padding: "grid * 2",
+                    margin: `0 2px 0 0`,
+                    boxShadow: snapshot.isDragging
+                      ? "0 0 .4rem #666"
+                      : "none",
+                  }}>
+                    <label class="bp3-control bp3-checkbox bp3-align-right" style={{marginBottom: '-35px'}}>
+                      <input type="checkbox" class="bp3-large" checked={photo.visible} onChange={updateCheckChanged(index)}/>
+                      <span class="bp3-control-indicator"></span>
+                      <b style={{fontSize: '170%', WebkitTextStrokeWidth: '1px', WebkitTextStrokeColor: 'white'}}>{index+1}</b>
+                    </label>
+                    <img src={photo.captura} style={{ width: "230px", height: "230px", borderRadius: "10px" }} {...provided.dragHandleProps}/>
+                    <input  type="text" name="name" value={photo.descripcion} onChange={updateFieldChanged(index)}  />
+
+                  </div>
+                )}
+                </Draggable>
+              ))}
+            </div>
+        )}
+       </Droppable>
+       </DragDropContext>
+       </div>
+
+       <CKEditor
+       editor={ClassicEditor}
+       onChange={handleOnChage}
+       data = {datos}
+       />
+      </React.Fragment>
+      )    
+  }
 
 export default App
