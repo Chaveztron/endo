@@ -625,6 +625,14 @@ const [capturas, setCapturas] = useState(ipcRenderer.sendSync('get-capturas', {
   const handleOnChage = (e, editor) => {
     setDatos(editor.getData())
   }
+
+  const updateCheckChanged = index => e => {
+    console.log(index)
+    console.log(e.target.checked)
+    let newArr = [...capturas]; // copying the old datas array
+    newArr[index].visible = e.target.checked; // replace e.target.value with whatever you want to change it to
+    setCapturas(newArr); // ??
+  }
   
   var sesionReporte = ipcRenderer.sendSync('get-sesion', {
     sesion_id: props.location.props.idReporte,
@@ -777,9 +785,10 @@ const [capturas, setCapturas] = useState(ipcRenderer.sendSync('get-capturas', {
       data = {datos}
       />
 
-
      
       <h3>Fotografias</h3>
+
+      <div style={{height: 290,  backgroundColor: 'khaki', overflow: "scroll"}}>
       <DragDropContext 
       onDragEnd={(param) => {
         const srcI = param.source.index;
@@ -789,14 +798,10 @@ const [capturas, setCapturas] = useState(ipcRenderer.sendSync('get-capturas', {
           setCapturas(capturas)
         }
       }}
-      
       >       
-   
-
-    
-      <Droppable droppableId="droppable-1" direction="horizontal" style={{ border: 'solid black', width: "1000px", height: "800px"}}>
+      <Droppable droppableId="droppable-1" direction="horizontal">
       {(provided, _) => (
-            <div ref={provided.innerRef} {...provided.droppableProps} >
+            <div ref={provided.innerRef} {...provided.droppableProps} style={{ display: "flex", padding: "grid", width: capturas.length*230}}>
             {capturas.slice(0).map((photo, index) => (
               <Draggable key={photo.identificador} draggableId={"draggable-"+photo.identificador} index={index}>
               {(provided, snapshot) => (
@@ -804,43 +809,28 @@ const [capturas, setCapturas] = useState(ipcRenderer.sendSync('get-capturas', {
                 {...provided.draggableProps}
                 style={{
                   ...provided.draggableProps.style,
-                  margin: "20px", textAlign: "center", float: 'left',
+                  userSelect: "none",
+                  padding: "grid * 2",
+                  margin: `0 2px 0 0`,
                   boxShadow: snapshot.isDragging
                     ? "0 0 .4rem #666"
                     : "none",
                 }}>
-
-
-  
-
-                <img src={photo.captura} style={{ width: "230px", height: "230px", borderRadius: "10px" }} {...provided.dragHandleProps}/>
-                <label class="bp3-control bp3-checkbox bp3-align-right">
-                <input type="checkbox" class="bp3-large" />
-                <span class="bp3-control-indicator"></span>
-                {index+1}-{photo.descripcion}
-              </label>
-
-
-                
-                
-                
-
-
-
-
+                  <img src={photo.captura} style={{ width: "230px", height: "230px", borderRadius: "10px" }} {...provided.dragHandleProps}/>
+                    <label class="bp3-control bp3-checkbox bp3-align-right">
+                      <input type="checkbox" class="bp3-large" checked={photo.visible} onChange={updateCheckChanged(index)}/>
+                      <span class="bp3-control-indicator"></span>
+                      {index+1}-{photo.descripcion}
+                    </label>
                 </div>
               )}
               </Draggable>
             ))}
           </div>
       )}
-
      </Droppable>
-   
-     
-    
      </DragDropContext>
-
+     </div>
     </React.Fragment>
     )    
 }

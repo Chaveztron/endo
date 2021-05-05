@@ -315,6 +315,7 @@ app.on('ready', () => {
                     identificador: row.identificador,
                     captura: row.captura,
                     descripcion: row.descripcion,
+                    visible: row.visible
                 };
                 capturas.push(captura);
             }
