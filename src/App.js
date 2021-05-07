@@ -590,8 +590,6 @@ const toggle = () => {
     )    
 }
 
-
-
 const Sesiones = (props) => {
   const [sesiones, setSesiones] = useState(ipcRenderer.sendSync('get-todas_sesiones').reverse())
   const [toggleState, setToggleState] = useState(false)
@@ -1199,7 +1197,7 @@ const EdicionInforme = (props) => {
     const [ins, setIns] = useState("")
     const [enc, setEnc] = useState("")
     const [datos, setDatos] = useState("")
-  
+    
     useEffect(() => {
       var dia = new Intl.DateTimeFormat("default", {day: "2-digit"}).format(sesionReporte.fecha)
       var mes = new Intl.DateTimeFormat("default", {month: "2-digit"}).format(sesionReporte.fecha)
@@ -1216,6 +1214,7 @@ const EdicionInforme = (props) => {
       setEnc(sesionReporte.encabezado)
       setDatos(sesionReporte.hallazgo)
       setEsquema(sesionReporte.esquema)
+      setCapturas(capturas.sort((a, b) => a.identificador > b.identificador ? 1 : -1))
     },[]);
 
     const [imageCode, setImageCode] = React.useState()
@@ -1261,6 +1260,9 @@ const EdicionInforme = (props) => {
     var sesionReporte = ipcRenderer.sendSync('get-sesion', {
       sesion_id: props.location.props.idReporte,
     })
+
+    var fechaOriginal = sesionReporte.fecha
+
     var paciente = ipcRenderer.sendSync('get-paciente', {
       paciente_id: sesionReporte.paciente,
     })
@@ -1294,9 +1296,18 @@ const EdicionInforme = (props) => {
   
     const handleSubmit = (evt) => {
       evt.preventDefault();
+
+      var dia = new Intl.DateTimeFormat("default", {day: "2-digit"}).format(fechaOriginal)
+      var mes = new Intl.DateTimeFormat("default", {month: "2-digit"}).format(fechaOriginal)
+      var years = new Intl.DateTimeFormat("default", {year: "numeric"}).format(fechaOriginal)
+      var fechaO = years+"-"+mes+"-"+dia
+      console.log(fechaO+"  "+date)
+
+
+
       console.log(ipcRenderer.sendSync('update-sesion', {
         id: props.location.props.idReporte,
-        fecha: Date.parse(date),
+        fecha: fechaO === date?fechaOriginal:Date.parse(date),
         hallazgo: datos,
         doctor: doc,
         procedimiento: proc,
@@ -1307,6 +1318,15 @@ const EdicionInforme = (props) => {
         encabezado: enc,
         esquema: esquema
       }))
+      capturas.map((photo, index) => ( 
+        console.log(ipcRenderer.sendSync('update-captura', {
+          id: photo.id,
+          identificador: index+1,
+          captura: photo.captura,
+          descripcion: photo.descripcion,
+          visible: photo.visible === 'true'||photo.visible === true?'true':null
+        })) 
+      ))
     }
   
     return(

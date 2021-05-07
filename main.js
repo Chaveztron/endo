@@ -137,6 +137,46 @@ app.on('ready', () => {
             knex.destroy();
         });
     })
+
+    ipcMain.on('get-capturas', (event, arg) => {
+        const knex = require('knex')(options);
+        var capturas=[];
+        knex.from('captura').select("*")
+        .where({ sesion: arg.sesion_id })
+        .then((rows) => {
+            for (row of rows) {
+                var captura = {
+                    id: row.id, 
+                    identificador: row.identificador,
+                    captura: row.captura,
+                    descripcion: row.descripcion,
+                    visible: row.visible,
+                    sesion: row.sesion
+                };
+                capturas.push(captura);
+            }
+            event.returnValue = capturas
+        }).catch((err) => { console.log( err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+    })
+
+    ipcMain.on('update-captura', (event, arg) => {
+        const knex = require('knex')(options);
+        knex('captura').where({ 'id': arg.id })
+        .update({ 
+            identificador: arg.identificador,
+            captura: arg.captura,
+            descripcion: arg.descripcion,
+            visible: arg.visible
+        })
+        .catch((err) => { console.log(err); throw err })
+        .finally(() => {
+            knex.destroy();
+        });
+        event.returnValue = 'captura actualizado'
+    })
     
     ipcMain.on('get-pacientes', (event, arg) => {
         const knex = require('knex')(options);
@@ -298,29 +338,6 @@ app.on('ready', () => {
                 sesiones.push(sesion);
             }
             event.returnValue = sesiones
-        }).catch((err) => { console.log( err); throw err })
-        .finally(() => {
-            knex.destroy();
-        });
-    })
-    
-    ipcMain.on('get-capturas', (event, arg) => {
-        const knex = require('knex')(options);
-        var capturas=[];
-        knex.from('captura').select("*")
-        .where({ sesion: arg.sesion_id })
-        .then((rows) => {
-            for (row of rows) {
-                var captura = {
-                    id: row.id, 
-                    identificador: row.identificador,
-                    captura: row.captura,
-                    descripcion: row.descripcion,
-                    visible: row.visible
-                };
-                capturas.push(captura);
-            }
-            event.returnValue = capturas
         }).catch((err) => { console.log( err); throw err })
         .finally(() => {
             knex.destroy();
