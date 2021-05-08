@@ -704,10 +704,19 @@ const Reportes = (props) => {
   const [capturas, setCapturas] = useState(ipcRenderer.sendSync('get-capturas', {
     sesion_id:  props.location.reporteProps.estudios_id
   }))
+  const [fotos, setFotos] = useState([])
+
   const [esquema, setEsquema] = React.useState(props.location.reporteProps.esquema)
   const paciente = ipcRenderer.sendSync('get-paciente', {
     paciente_id:  props.location.reporteProps.paciente
   })
+
+
+  useEffect(() => {
+    setFotos(capturas.sort((a, b) => a.identificador > b.identificador ? 1 : -1))
+    console.log(fotos)
+  },[]);
+
   const hallazgo = props.location.reporteProps.hallazgo
   const doctor = ipcRenderer.sendSync('get-doctor', {doctor_id: props.location.reporteProps.doctor})
   const procedimiento = ipcRenderer.sendSync('get-procedimiento', {procedimiento_id: props.location.reporteProps.procedimiento})
@@ -824,11 +833,12 @@ const Reportes = (props) => {
 
 
  <div className="fotografias" style={{float:"left", alignContent: "center"}}>
-  {capturas.slice(0).map((photo, index) => (
-    <div className="foto" key={{ index }} style={{margin: "5px", textAlign: "center", float: "left"}}>
+  {fotos.map((photo, index) => (
+    
+    <div className="foto" key={{ index }} style={{margin: "5px", textAlign: "center", float: "left", display:photo.visible==='true'?'true':'none'}}>
     <img src={photo.captura} style={{ width: "230px", height: "230px", borderRadius: "10px" }} />
-    <h6 style={{marginTop: "2px"}}>{photo.identificador}-{photo.descripcion}</h6>
-  </div>
+    <h6 style={{marginTop: "2px"}}>{photo.identificador}-{photo.descripcion} </h6>
+    </div>
   ))}
 
  </div>
