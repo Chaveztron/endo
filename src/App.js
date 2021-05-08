@@ -890,6 +890,26 @@ const Videos = ({location}, props) => {
     newPhotos.splice(i, 1)
     setPhotos(newPhotos)
 }
+
+const addPhotos = () => {
+
+  photos.map((photo, index) => ( 
+    console.log(ipcRenderer.sendSync('add-captura', {
+
+
+      sesion: sesion,
+      identificador: photo.ids,
+      captura: photo.imageSrc,
+      descripcion: photo.lugarOrgano,
+
+
+
+    })) 
+  ))
+
+
+
+}
   
   const onSubmit = data => {
     setDeviceId(data.Device)
@@ -907,7 +927,7 @@ const Videos = ({location}, props) => {
       motivo_estudio: data.Motivo_del_estudio
     }))
 
-    
+
 
 
   }
@@ -959,14 +979,14 @@ const Videos = ({location}, props) => {
               <Col sm={8}>
               
                     <NavLink 
-                    to={{pathname:'/esquema',
-                        esquemaProps:{
-                          photos: photos,
-                          sesion: sesion,
-                          paciente: id
-                        }}}>
-                    <Button icon="flow-end" intent="success" large text="Continuar con el estudio"/>
+                    to={{pathname:'/editarInforme',
+                    props:{
+                      idReporte: sesion
+                    }}}>
+                    <Button icon="flow-end" intent="success" large text="Continuar con el estudio" onClick={() => addPhotos()}/>
                     </NavLink>
+
+
                   <br/>
                     <Webcam audio={false} videoConstraints={{ deviceId: deviceId }} ref={webcamRef} screenshotFormat="image/jpeg" />
                   <br/>
@@ -1187,6 +1207,7 @@ const EdicionInforme = (props) => {
   const [capturas, setCapturas] = useState(ipcRenderer.sendSync('get-capturas', {
       sesion_id:  props.location.props.idReporte
     }))
+    const [toggleState, setToggleState] = useState(false)
     const [esquema, setEsquema] = React.useState("")
     const [date, setDate] = useState("")
     const [doc, setDoc] = useState("")
@@ -1263,6 +1284,10 @@ const EdicionInforme = (props) => {
 
     var fechaOriginal = sesionReporte.fecha
 
+    var dia = new Intl.DateTimeFormat("default", {day: "2-digit"}).format(fechaOriginal)
+    var mes = new Intl.DateTimeFormat("default", {month: "2-digit"}).format(fechaOriginal)
+    var years = new Intl.DateTimeFormat("default", {year: "numeric"}).format(fechaOriginal)
+
     var paciente = ipcRenderer.sendSync('get-paciente', {
       paciente_id: sesionReporte.paciente,
     })
@@ -1297,14 +1322,8 @@ const EdicionInforme = (props) => {
     const handleSubmit = (evt) => {
       evt.preventDefault();
 
-      var dia = new Intl.DateTimeFormat("default", {day: "2-digit"}).format(fechaOriginal)
-      var mes = new Intl.DateTimeFormat("default", {month: "2-digit"}).format(fechaOriginal)
-      var years = new Intl.DateTimeFormat("default", {year: "numeric"}).format(fechaOriginal)
+  
       var fechaO = years+"-"+mes+"-"+dia
-      console.log(fechaO+"  "+date)
-
-
-
       console.log(ipcRenderer.sendSync('update-sesion', {
         id: props.location.props.idReporte,
         fecha: fechaO === date?fechaOriginal:Date.parse(date),
@@ -1327,6 +1346,8 @@ const EdicionInforme = (props) => {
           visible: photo.visible === 'true'||photo.visible === true?'true':null
         })) 
       ))
+
+      setToggleState(toggleState === false ? true : false)
     }
   
     return(
@@ -1423,7 +1444,34 @@ const EdicionInforme = (props) => {
                       </select>
                   </div>
                   </label>
-                  <button type="submit">Guardar Cambios</button>
+
+                  {toggleState?
+                    <NavLink
+                    to={{pathname:'/reportes',
+                    reporteProps:{
+                    fechaEstudio: years+"-"+mes+"-"+dia === date?fechaOriginal:Date.parse(date),
+                    paciente: sesionReporte.paciente,
+                    estudios_id: sesionReporte.id,
+                    esquema: esquema,
+                    hallazgo: datos,
+                    doctor: doc,
+                    procedimiento: proc,
+                    sedante: sed,
+              
+                    motivo_estudio: mot,
+                    asistente: asis,
+                    instrumento: ins,
+              
+                    encabezado: enc
+              
+                    }}}
+                    >
+                    <Button icon="print" large text="Generar Reporte" intent="success"/>
+                    </NavLink>
+                    : 
+                    <button type="submit">Guardar Cambios</button>}
+
+                  
                   </form>
         </Col>
         <Col >
