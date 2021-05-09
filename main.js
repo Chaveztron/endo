@@ -221,7 +221,8 @@ app.on('ready', () => {
         .then((rows) => {
             for (row of rows) {
                 var sesion = {
-                    id: row.id, 
+                    id: row.id,
+                    paciente: row.paciente, 
                     fecha: row.fecha,
                     esquema: row.esquema,
                     hallazgo: row.hallazgo,
@@ -231,7 +232,9 @@ app.on('ready', () => {
 
                     motivo_estudio: row.motivo_estudio,
                     asistente: row.asistente,
-                    instrumento: row.instrumento
+                    instrumento: row.instrumento,
+
+                    encabezado: row.encabezado
                 };
                 sesiones.push(sesion);
             }

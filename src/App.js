@@ -32,7 +32,7 @@ const App = () => {
         <NavLink to='/Pacientes' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-database">Pacientes</button></NavLink>
         <NavLink to='/sesiones' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-document">Sesiones</button></NavLink>
         <NavLink to='/configuracion' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-cog">Configuracion</button></NavLink>
-        <NavLink to='/editarInforme' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-cog">editarInforme</button></NavLink>
+       
           <span class="bp3-navbar-divider"></span>
         </div>
       </nav>
@@ -571,7 +571,14 @@ const toggle = () => {
               hallazgo: estudio.hallazgo,
               doctor: estudio.doctor,
               procedimiento: estudio.procedimiento,
-              sedante: estudio.sedante
+              sedante: estudio.sedante,
+              motivo_estudio: estudio.motivo_estudio,
+              asistente: estudio.asistente,
+              instrumento: estudio.instrumento,
+
+              encabezado: estudio.encabezado
+
+
             }}}
             >
             <button class="bp3-button bp3-minimal bp3-icon-print"/>
@@ -741,28 +748,33 @@ const Reportes = (props) => {
   return(
     <React.Fragment>
     <Button icon="add" icon="print" onClick={handlePrint}>Imprimir Reporte!!</Button>
-    <Container ref={componentRef}>
-    <body className="hoja">
-    <div className="logo" style={{backgroundColor: "#499ae9", padding: "5px", width: "20%", height: "108px", marginRight: "10px", float: "left", borderRadius: "10px" }}>
-    <img src="http://endoclinik.com.mx/wp-content/uploads/2019/05/logobalnco.png" style={{width: "200px", marginTop:"20px"}} />
-  </div>
 
-  <div className="titulo" style={{backgroundColor: "#d4e4ef", padding: "5px", textAlign: "center", width: "70%", height: "108px", float: "left", borderRadius: "10px"}}>
-      <b>{encabezado.empresa}</b>  <br/>
+    <NavLink
+    to={{pathname:'/editarInforme',
+    props:{
+      idReporte: props.location.reporteProps.estudios_id
+    }}}
+    >
+    <Button icon="add" icon="edit" >Editar Reporte</Button>
+    </NavLink>
+
+    <Container ref={componentRef} >
+    <body className="hoja" style={{ width: "816.0102804445px", height: "1056.013304105px"}} >
+  <div style={{ width: "816.0102804445px", display: 'flex', marginTop: '10px'}}>
+  <div className="logo" >
+    <img src={require("./media/logo.png")} className='imglogo'/>
+  </div>
+  <div className="titulo">
+      <b style={{fontSize: 'large', color: 'deepskyblue'}}>{encabezado.empresa}</b>  <br/>
       {encabezado.giro}<br/>
       {encabezado.telefono}<br/>
       {encabezado.direccion}<br/>
   </div>
+  </div>
 
-
-  <div className="esquema" style={{float: "left"}}>
-  <img
-     src={esquema}
-     style={{ width: "250px", float: "left" }}
-  />
-    </div>
-
-  <table className="tablaI" style={{float: "left", marginTop: "0px", fontSize: "medium", float:"left"}}>
+  <div style={{ width: "816.0102804445px", display: 'flex'}}>
+  <div className='inform'>
+  <table className="tablaI" >
     <tr>
       <td><b>Paciente:</b></td>
       <td>
@@ -779,14 +791,15 @@ const Reportes = (props) => {
       }).format(now)) - parseInt(anoNacimiento)} AÑOS
       </td>
     </tr>
-    <tr>
-      <td><b>Referido por:</b></td>
-      <td>{(doctor.doctor).toUpperCase()}</td>
-    </tr>
+
     <tr>
       <td><b>Procedimiento:</b></td>
       <td>{procedimiento.procedimiento}</td>
     </tr>
+    <tr>
+      <td><b>Sedacion:</b></td>
+      <td>{sedante.sedante}</td>
+     </tr>
     <tr>
       <td><b>Fecha del estudio:</b></td>
       <td>
@@ -805,18 +818,18 @@ const Reportes = (props) => {
       }).format(props.location.reporteProps.fechaEstudio)}
       </td>
     </tr>
-    <tr>
-      <td><b>Sedacion:</b></td>
-      <td>{sedante.sedante}</td>
-    </tr>
   </table>
 
-  <table className="tablaI" style={{float: "left", marginTop: "0px", fontSize: "medium", float:"left"}}>
+  <table className="tablaI">
   <tr>
     <td><b>Instrumento:</b></td>
     <td>
       {instrumento.instrumento}
     </td>
+  </tr>
+  <tr>
+    <td><b>Referido por:</b></td>
+    <td>{(doctor.doctor).toUpperCase()}</td>
   </tr>
   <tr>
     <td><b>Asistente:</b></td>
@@ -829,36 +842,42 @@ const Reportes = (props) => {
     <td>{motivo}</td>
   </tr>
 </table>
+</div>
 
 
+<div className="esquema">
+  <img
+    src={esquema}
+    style={{ width: "200px"}}
+  />
+</div>
+</div>
 
- <div className="fotografias" style={{float:"left", alignContent: "center"}}>
+ <div className="fotografias" >
   {fotos.map((photo, index) => (
-    
     <div className="foto" key={{ index }} style={{margin: "5px", textAlign: "center", float: "left", display:photo.visible==='true'?'true':'none'}}>
-    <img src={photo.captura} style={{ width: "230px", height: "230px", borderRadius: "10px" }} />
+    <img src={photo.captura} className='imgPhoto' />
+
     <h6 style={{marginTop: "2px"}}>{photo.identificador}-{photo.descripcion} </h6>
     </div>
   ))}
-
  </div>
+
+ {/*
 <div style={{float:"left"}}>
         <p>
           {ReactHtmlParser(hallazgo)}
         </p>
   </div>
-
+ */}
 
   <div className="pie" style={{width: "85%"}}>
     <b>{encabezado.empresa}</b>
   </div>
-
   </body>
-
-
-    </Container>
-    </React.Fragment>
-    )    
+  </Container>
+  </React.Fragment>
+  )    
 }
 
 const Videos = ({location}, props) => {
