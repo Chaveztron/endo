@@ -69,10 +69,6 @@ body {
   flex: 1
 }
 
-
-
-
-
 .logo, .titulo
 {
   padding: 5px;
@@ -88,6 +84,21 @@ body {
 tr, td
 {
   border-bottom: dotted 1px silver;
+}
+
+.webcamera {
+  background-color: black;
+  border-radius: 13px;
+  width: 100%;
+  
+}
+
+
+
+.webcamera:active {
+  
+  padding: 50px;
+  transition: all 0.3s
 }
 
 .logo

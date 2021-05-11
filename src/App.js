@@ -15,6 +15,9 @@ import ReactHtmlParser from 'react-html-parser';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { ListContainer, ListItem } from "./styles";
 
+import useSound from 'use-sound';
+import boopSfx from './media/camera.wav';
+
 
 
 const { ipcRenderer } = window.require("electron");
@@ -32,7 +35,6 @@ const App = () => {
         <NavLink to='/Pacientes' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-database">Pacientes</button></NavLink>
         <NavLink to='/sesiones' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-document">Sesiones</button></NavLink>
         <NavLink to='/configuracion' activeClassName='active'><button class="bp3-button bp3-minimal bp3-icon-cog">Configuracion</button></NavLink>
-       
           <span class="bp3-navbar-divider"></span>
         </div>
       </nav>
@@ -891,7 +893,10 @@ const Videos = ({location}, props) => {
       setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput")),
     [setDevices]
   );
-  
+
+  const [play] = useSound(boopSfx);
+
+ 
   React.useEffect(
     () => {
       navigator.mediaDevices.enumerateDevices().then(handleDevices);
@@ -903,15 +908,17 @@ const Videos = ({location}, props) => {
   const areaOrgano = React.useRef(null);
   const capture = React.useCallback(
     () => {
-      
       ids = ids + 1
       const imageSrc = webcamRef.current.getScreenshot();
       const lugarOrgano = areaOrgano.current.value
       areaOrgano.current.value = ""      
-      setPhotos(photos => [...photos,{ids, imageSrc, lugarOrgano}])
+      setPhotos(photos => [...photos,{ids, imageSrc, lugarOrgano}])   
     },
-    [webcamRef]
+    [webcamRef],
   )
+
+  
+
   const { id } = queryString.parse(location.search)
 
   const deleteItem = (i) => {
@@ -999,7 +1006,7 @@ const addPhotos = () => {
 
   return (
     <React.Fragment>
-      <h1>Endoscopía al paciente { (ipcRenderer.sendSync('get-paciente', {paciente_id:  id})).nombre }</h1>
+      {/*<h1>Endoscopía al paciente { (ipcRenderer.sendSync('get-paciente', {paciente_id:  id})).nombre }</h1>*/}
 
       {deviceId
         ?  <React.Fragment>
@@ -1014,20 +1021,20 @@ const addPhotos = () => {
                     }}}>
                     <Button icon="flow-end" intent="success" large text="Continuar con el estudio" onClick={() => addPhotos()}/>
                     </NavLink>
-
+            
 
                   <br/>
-                    <Webcam audio={false} videoConstraints={{ deviceId: deviceId }} ref={webcamRef} screenshotFormat="image/jpeg" />
+                    <Webcam className='webcamera' audio={false} videoConstraints={{ deviceId: deviceId }} ref={webcamRef} screenshotFormat="image/jpeg" onClick={capture} onMouseUp={() => {play()}}/>
                   <br/>
                   <input type="text" class="bp3-input bp3-large bp3-fill bp3-round" placeholder="Lugar del organo..." ref={areaOrgano}/> 
-                  <Button icon="camera" intent="primary" large text="Capturar fotografia" onClick={capture}/>
+                  
               
               </Col>
               <Col sm={4}>
                 {photos.slice(0).reverse().map((photo, index) => (
-                      <Card elevation={Elevation.TWO} key={photo.ids} style={{width: "250px", margin: "20px"}}>
+                      <Card elevation={Elevation.TWO} key={photo.ids} style={{width: "250px", margin: "20px"}}  onChange={play}>
                         <p style={{width: "250px", margin: "-20px", marginBottom: "20px"}}><button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>{photo.ids}</p>
-                        <img style={{width: "250px", margin: "-20px"}} src={photo.imageSrc}/>
+                        <img style={{width: "250px", margin: "-20px"}} src={photo.imageSrc} />
                         <br/>  
                         <p style={{marginTop: "20px"}}>{photo.lugarOrgano}</p>
                     </Card>
