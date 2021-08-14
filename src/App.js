@@ -18,6 +18,8 @@ import { ListContainer, ListItem } from "./styles";
 import useSound from 'use-sound';
 import boopSfx from './media/camera.wav';
 
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
+
 
 
 const { ipcRenderer } = window.require("electron");
@@ -887,6 +889,9 @@ const Videos = ({location}, props) => {
   const [devices, setDevices] = React.useState([]);
   const [photos, setPhotos] = React.useState([]);
   const [sesion, setSesion] = React.useState("")
+
+  const handle = useFullScreenHandle();
+  const handle2 = useFullScreenHandle();
   
   const handleDevices = React.useCallback(
     mediaDevices =>
@@ -1010,10 +1015,12 @@ const addPhotos = () => {
 
       {deviceId
         ?  <React.Fragment>
+          <FullScreen handle={handle}>
         <Container fluid>
             <Row>
+
               <Col sm={8}>
-              
+              <FullScreen handle={handle2}>
                     <NavLink 
                     to={{pathname:'/editarInforme',
                     props:{
@@ -1021,16 +1028,23 @@ const addPhotos = () => {
                     }}}>
                     <Button icon="flow-end" intent="success" large text="Continuar con el estudio" onClick={() => addPhotos()}/>
                     </NavLink>
-            
+                    <Button icon="fullscreen" onClick={handle.enter}>
+                      con carrete
+                    </Button>
+                    
+                    <Button icon="fullscreen" onClick={handle2.enter}>
+                    Sin carrete
+                    </Button>
 
                   <br/>
                     <Webcam className='webcamera' audio={false} videoConstraints={{ deviceId: deviceId }} ref={webcamRef} screenshotFormat="image/jpeg" onClick={capture} onMouseUp={() => {play()}}/>
                   <br/>
                   <input type="text" class="bp3-input bp3-large bp3-fill bp3-round" placeholder="Lugar del organo..." ref={areaOrgano}/> 
+                </FullScreen> 
                   
-              
               </Col>
               <Col sm={4}>
+
                 {photos.slice(0).reverse().map((photo, index) => (
                       <Card elevation={Elevation.TWO} key={photo.ids} style={{width: "250px", margin: "20px"}}  onChange={play}>
                         <p style={{width: "250px", margin: "-20px", marginBottom: "20px"}}><button onClick={() => deleteItem(index)} class="bp3-button bp3-minimal bp3-icon-trash"/>{photo.ids}</p>
@@ -1040,8 +1054,11 @@ const addPhotos = () => {
                     </Card>
                     ))}
               </Col>
+
+
             </Row>
         </Container>
+        </FullScreen>
         </React.Fragment>
         : <React.Fragment>
         <h3>Rellene el fomulario y seleccione fuente capturadora</h3>
