@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter, Route, NavLink } from 'react-router-dom'
+import { BrowserRouter, Route, NavLink, Router, Link  } from 'react-router-dom'
 import queryString from 'query-string'
 import './App.css'
 import { Button, Card, Elevation, ControlGroup, InputGroup } from "@blueprintjs/core";
 import Webcam from "react-webcam";
 import { Form, Input, Select, NumInput, Radios, DatePiker } from "./components";
 import HomePage from "./esquemaJs/HomePage";
+import Editor from "./editor/Editor";
 import { useReactToPrint } from 'react-to-print';
 import { Container, Row, Col, Card as Card2, Form as BForm, Modal } from "react-bootstrap";
 import { CKEditor } from '@ckeditor/ckeditor5-react';
@@ -49,6 +50,11 @@ const App = () => {
       <Route path='/reportes' render={(props)=> <Reportes {...props} />} />
       <Route path='/editarInforme' render={(props)=> <EdicionInforme {...props} />} />
       <Route path='/configuracion' render={(props)=> <Configuracion {...props} />} />
+
+
+        
+
+
     </BrowserRouter>
   )
 }
@@ -89,6 +95,10 @@ const Add_paciente = (props) => {
         <NumInput name="Edad"/>
         <Button type="submit" value="Submit" >Agregar </Button>
       </Form> 
+
+
+      
+   
     </React.Fragment>
   )
 }
@@ -1224,11 +1234,14 @@ const guardar = () => {
         <Row>     
           <Col >
           <HomePage dataImage={image => setEsquema(image)} photo={null}/>
+              
           </Col>
         </Row>
+
       </Container>
     </Col>
   </Row>
+
 </Container>
 
     <Modal
@@ -1424,7 +1437,7 @@ const EdicionInforme = (props) => {
   
         <Container fluid>
         <Row>     
-          <Col >
+          <Col sm={4}>
                   <form onSubmit={handleSubmit}>
                   <label class="bp3-label bp3-inline"> Fecha del estudio:
                   <input placeholder="Apellido materno" type="date" value={date} onChange={e => setDate(e.target.value)}/></label>
@@ -1527,8 +1540,11 @@ const EdicionInforme = (props) => {
                   
                   </form>
         </Col>
-        <Col >
-            <HomePage dataImage={image => setEsquema(image)} photo={sesionReporte.esquema}/>
+        <Col sm={8}>
+            
+
+            <Editor dataImg={image => setEsquema(image)} img={sesionReporte.esquema}/>
+
         </Col>
         </Row>
       </Container>
@@ -1594,19 +1610,22 @@ const EdicionInforme = (props) => {
        onHide={handleClose}
        backdrop="static"
        keyboard={false}
+       size="lg"
        >
          <Modal.Header closeButton>
            <Modal.Title>Edición de fotografía</Modal.Title>
          </Modal.Header>
            <Modal.Body>
-           <HomePage dataImage={image => setphotoEdit(image)} photo={imageCode}/>
+           
+
+           <Editor dataImg={image => setphotoEdit(image)} img={imageCode}/>
            
            </Modal.Body>
          <Modal.Footer>
            <Button variant="secondary" onClick={handleClose}>
              Cancelar
            </Button>
-           <Button variant="primary" onClick={() => editPhoto(imageCodeIndex)}>Aplicar Cambios</Button>
+           <Button variant="primary" onClick={() => editPhoto(imageCodeIndex)}>Guardar</Button>
          </Modal.Footer>
         </Modal>
 
