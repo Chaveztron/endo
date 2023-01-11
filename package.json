@@ -9,7 +9,7 @@
     "@toast-ui/react-image-editor": "^3.15.0",
     "bootstrap": "^4.5.3",
     "electron-is-dev": "^1.2.0",
-    "knex": "^0.21.2",
+    "knex": "^2.4.0",
     "konva": "^7.0.5",
     "query-string": "^6.13.1",
     "react": "^16.13.1",
